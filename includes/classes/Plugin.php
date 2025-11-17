@@ -63,6 +63,7 @@ class Plugin {
 		$column_asset  = require_once PULSAR_EXTENSIONS_PATH . 'build/column-control.asset.php';
 		$columns_asset = require_once PULSAR_EXTENSIONS_PATH . 'build/columns-controls.asset.php';
 		$group_asset   = require_once PULSAR_EXTENSIONS_PATH . 'build/group-controls.asset.php';
+		$grid_asset    = require_once PULSAR_EXTENSIONS_PATH . 'build/grid-controls.asset.php';
 
 		if ( $column_asset ) {
 			wp_enqueue_script(
@@ -94,6 +95,18 @@ class Plugin {
 				PULSAR_EXTENSIONS_URL . 'build/group-controls.js',
 				$group_asset['dependencies'],
 				$group_asset['version'],
+				[
+					'in_footer' => true,
+				],
+			);
+		}
+
+		if ( $grid_asset ) {
+			wp_enqueue_script(
+				'pulsar-extensions-grid-controls',
+				PULSAR_EXTENSIONS_URL . 'build/grid-controls.js',
+				$grid_asset['dependencies'],
+				$grid_asset['version'],
 				[
 					'in_footer' => true,
 				],
