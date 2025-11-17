@@ -1,4 +1,4 @@
-import { registerBlockExtension } from '@10up/block-components';
+import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 
 /**
  * additional block attributes object

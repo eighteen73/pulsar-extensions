@@ -12,14 +12,13 @@ import { useSelect } from '@wordpress/data';
 /**
  * External dependencies
  */
-import { registerBlockExtension } from '@10up/block-components';
+import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
 import FlexOrderControl from '../components/flex-order-control';
-import './style.scss';
 
 /**
  * additional block attributes object

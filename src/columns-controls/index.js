@@ -2,20 +2,19 @@
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
-import { ToggleControl, PanelBody } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
  */
-import { registerBlockExtension } from '@10up/block-components';
+import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
 import BreakpointSelectionControl from '../components/breakpoint-selection-control';
-import './style.scss';
 
 /**
  * additional block attributes object
@@ -24,7 +23,7 @@ const additionalAttributes = {
 	isReversedOnMobile: {
 		type: 'boolean',
 	},
-	stackBreakpoint: {
+	stackedBreakpoint: {
 		type: 'string',
 	},
 };
@@ -36,13 +35,13 @@ const additionalAttributes = {
  * @returns {JSX}
  */
 function BlockEdit({ attributes, setAttributes }) {
-	const { isReversedOnMobile, isStackedOnMobile, stackBreakpoint } =
+	const { isReversedOnMobile, isStackedOnMobile, stackedBreakpoint } =
 		attributes;
 
 	return (
 		<InspectorControls group="settings">
 			{isStackedOnMobile && (
-				<PanelBody className="pulsar-extensions-columns-controls-panel-body">
+				<div style={{ padding: '0 16px 8px' }}>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={__(
@@ -58,13 +57,13 @@ function BlockEdit({ attributes, setAttributes }) {
 					/>
 
 					<BreakpointSelectionControl
-						label={__('Stack breakpoint', 'pulsar-extensions')}
-						value={stackBreakpoint || 'md'}
+						label={__('Stacked breakpoint', 'pulsar-extensions')}
+						value={stackedBreakpoint || 'md'}
 						onChange={(value) =>
-							setAttributes({ stackBreakpoint: value })
+							setAttributes({ stackedBreakpoint: value })
 						}
 					/>
-				</PanelBody>
+				</div>
 			)}
 		</InspectorControls>
 	);
@@ -81,7 +80,7 @@ function generateClassNames(attributes) {
 		attributes;
 
 	return clsx({
-		'is-reversed-on-mobile': isReversedOnMobile,
+		'is-reversed-when-stacked': isReversedOnMobile,
 		[`is-stacked-on-${stackBreakpoint}`]:
 			isStackedOnMobile && !!stackBreakpoint,
 	});

@@ -74,13 +74,6 @@ class Plugin {
 					'in_footer' => true,
 				],
 			);
-
-			wp_enqueue_style(
-				'pulsar-extensions-column-control',
-				PULSAR_EXTENSIONS_URL . 'build/style-column-control.css',
-				[],
-				$column_asset['version'],
-			);
 		}
 
 		if ( $columns_asset ) {
@@ -92,13 +85,6 @@ class Plugin {
 				[
 					'in_footer' => true,
 				],
-			);
-
-			wp_enqueue_style(
-				'pulsar-extensions-columns-controls',
-				PULSAR_EXTENSIONS_URL . 'build/style-columns-controls.css',
-				[],
-				$columns_asset['version'],
 			);
 		}
 
