@@ -1,9 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * External dependencies
@@ -32,14 +36,48 @@ const additionalAttributes = {
  * @param {object} props block props
  * @returns {JSX}
  */
-function BlockEdit({ attributes, setAttributes }) {
+function BlockEdit({ clientId, attributes, setAttributes }) {
 	const { orderWhenStacked } = attributes;
+	const columnCount = useSelect(
+		(select) => {
+			if (!clientId) {
+				return 1;
+			}
+
+			const { getBlockParentsByBlockName, getBlock } =
+				select(blockEditorStore);
+			const parentColumns = getBlockParentsByBlockName(clientId, [
+				'core/columns',
+			]);
+			const parentColumnsClientId = parentColumns?.[0];
+
+			if (!parentColumnsClientId) {
+				return 1;
+			}
+
+			const parentColumnsBlock = getBlock(parentColumnsClientId);
+
+			return parentColumnsBlock?.innerBlocks?.length || 1;
+		},
+		[clientId]
+	);
+
+	useEffect(() => {
+		if (
+			typeof orderWhenStacked === 'number' &&
+			orderWhenStacked > columnCount &&
+			columnCount > 0
+		) {
+			setAttributes({ orderWhenStacked: columnCount });
+		}
+	}, [columnCount, orderWhenStacked, setAttributes]);
 
 	return (
 		<InspectorControls group="settings">
 			<PanelBody>
 				<FlexOrderControl
-					value={orderWhenStacked}
+					value={orderWhenStacked || undefined}
+					itemCount={columnCount}
 					onChange={(value) =>
 						setAttributes({ orderWhenStacked: value })
 					}
@@ -59,7 +97,8 @@ function generateClassNames(attributes) {
 	const { orderWhenStacked } = attributes;
 
 	return clsx({
-		[`is-order-when-stacked-${orderWhenStacked}`]: orderWhenStacked,
+		[`is-order-${orderWhenStacked}`]:
+			orderWhenStacked && orderWhenStacked > 0,
 	});
 }
 
