@@ -2,6 +2,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useSettings,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -14,7 +15,6 @@ import {
 	CustomSelectControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalVStack as VStack,
-	__experimentalLinkControl as LinkControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { link, page, linkOff } from '@wordpress/icons';
@@ -134,7 +134,7 @@ function BlockEdit(props) {
 
 	return (
 		<>
-			{/* <BlockControls group="block">
+			<BlockControls group="block">
 				<ToolbarButton
 					ref={setPopoverAnchor}
 					name="link"
@@ -235,7 +235,7 @@ function BlockEdit(props) {
 						)}
 					</Popover>
 				)}
-			</BlockControls> */}
+			</BlockControls>
 
 			{supportsStacking && isRowLayout && (
 				<InspectorControls>
@@ -391,6 +391,8 @@ function BlockEdit(props) {
  */
 function generateClassNames(attributes) {
 	const {
+		href,
+		linkDestination,
 		isStackedOnMobile,
 		stackedBreakpoint,
 		isFlexWrapEnabled,
@@ -401,6 +403,8 @@ function generateClassNames(attributes) {
 	} = attributes;
 
 	return clsx({
+		['is-linked']: !!href,
+		['is-linked-to-post']: linkDestination === 'post',
 		'is-stacked-on-mobile': isStackedOnMobile && !isFlexWrapEnabled,
 		[`is-stacked-on-${stackedBreakpoint}`]:
 			isStackedOnMobile && !!stackedBreakpoint && !isFlexWrapEnabled,
