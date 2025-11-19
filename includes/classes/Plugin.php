@@ -38,7 +38,8 @@ class Plugin {
 	public function setup(): void {
 		add_action( 'init', [ $this, 'load_textdomain' ] );
 		add_action( 'init', [ $this, 'register_block_styles' ] );
-		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_scripts' ] );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_scripts' ] );
+		add_action( 'enqueue_block_assets', [ $this, 'enqueue_editor_styles' ] );
 	}
 
 	/**
@@ -177,19 +178,17 @@ class Plugin {
 	}
 
 	/**
-	 * Enqueue editor scripts and styles.
+	 * Enqueue editor scripts.
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts(): void {
+	public function enqueue_editor_scripts(): void {
 		$enabled_extensions = $this->get_enabled_extensions();
 
 		foreach ( $enabled_extensions as $block => $extensions ) {
 			foreach ( $extensions as $extension ) {
-				$asset_path     = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.asset.php";
-				$script_path    = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.js";
-				$style_path     = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.css";
-				$style_rtl_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}-rtl.css";
+				$asset_path  = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.asset.php";
+				$script_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.js";
 
 				// Check if asset file exists.
 				if ( ! file_exists( $asset_path ) || ! file_exists( $script_path ) ) {
@@ -210,21 +209,54 @@ class Plugin {
 						'in_footer' => true,
 					]
 				);
+			}
+		}
+	}
 
-				// Enqueue editor-only styles if they exist.
-				if ( file_exists( $style_path ) ) {
-					$style_handle = "{$script_handle}-editor";
-					wp_enqueue_style(
-						$style_handle,
-						PULSAR_EXTENSIONS_URL . "build/{$block}/{$extension}.css",
-						[],
-						$asset['version'],
-					);
+	/**
+	 * Enqueue editor-only styles.
+	 *
+	 * Uses enqueue_block_assets to ensure styles load inside the block editor iframe.
+	 *
+	 * @return void
+	 */
+	public function enqueue_editor_styles(): void {
 
-					// Add RTL support for editor styles.
-					if ( file_exists( $style_rtl_path ) ) {
-						wp_style_add_data( $style_handle, 'rtl', 'replace' );
-					}
+		// Only run in the admin block editor context.
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$enabled_extensions = $this->get_enabled_extensions();
+
+		foreach ( $enabled_extensions as $block => $extensions ) {
+			foreach ( $extensions as $extension ) {
+				$asset_path     = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.asset.php";
+				$style_path     = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.css";
+				$style_rtl_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}-rtl.css";
+
+				if ( ! file_exists( $style_path ) ) {
+					continue;
+				}
+
+				$version = filemtime( $style_path );
+
+				if ( file_exists( $asset_path ) ) {
+					$asset   = require $asset_path;
+					$version = $asset['version'] ?? $version;
+				}
+
+				$style_handle = "pulsar-extensions-{$block}-{$extension}-editor";
+
+				wp_enqueue_style(
+					$style_handle,
+					PULSAR_EXTENSIONS_URL . "build/{$block}/{$extension}.css",
+					[],
+					$version
+				);
+
+				if ( file_exists( $style_rtl_path ) ) {
+					wp_style_add_data( $style_handle, 'rtl', 'replace' );
 				}
 			}
 		}
@@ -244,8 +276,7 @@ class Plugin {
 			$block_name = $this->get_block_name_for_folder( $block );
 
 			foreach ( $extensions as $extension ) {
-				$style_path     = PULSAR_EXTENSIONS_PATH . "build/{$block}/style-{$extension}.css";
-				$style_rtl_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/style-{$extension}-rtl.css";
+				$style_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/style-{$extension}.css";
 
 				// Only register if the front-end style file exists.
 				if ( ! file_exists( $style_path ) ) {
