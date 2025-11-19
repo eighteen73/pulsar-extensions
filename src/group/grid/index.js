@@ -5,8 +5,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import GridColumnsControl from '../components/grid-columns-control';
-import BreakpointSelectionControl from '../components/breakpoint-selection-control';
+import GridColumnsControl from '../../components/grid-columns-control';
+import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
 
 /**
  * External dependencies
@@ -128,8 +128,8 @@ function generateClassNames(attributes) {
 	return clsx(classObject);
 }
 
-registerBlockExtension(['core/group'], {
-	extensionName: 'pulsar-extensions/grid-controls',
+registerBlockExtension('core/group', {
+	extensionName: 'pulsar-extensions/group/grid',
 	attributes: additionalAttributes,
 	classNameGenerator: generateClassNames,
 	Edit: BlockEdit,

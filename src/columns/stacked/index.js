@@ -14,7 +14,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
-import BreakpointSelectionControl from '../components/breakpoint-selection-control';
+import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
 
 /**
  * additional block attributes object
@@ -86,8 +86,8 @@ function generateClassNames(attributes) {
 	});
 }
 
-registerBlockExtension(['core/columns'], {
-	extensionName: 'pulsar-extensions/columns-controls',
+registerBlockExtension('core/columns', {
+	extensionName: 'pulsar-extensions/columns/stacked',
 	attributes: additionalAttributes,
 	classNameGenerator: generateClassNames,
 	Edit: BlockEdit,

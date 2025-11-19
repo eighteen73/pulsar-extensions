@@ -18,7 +18,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
-import FlexOrderControl from '../components/flex-order-control';
+import FlexOrderControl from '../../components/flex-order-control';
 
 /**
  * additional block attributes object
@@ -101,8 +101,8 @@ function generateClassNames(attributes) {
 	});
 }
 
-registerBlockExtension(['core/column'], {
-	extensionName: 'pulsar-extensions/column-controls',
+registerBlockExtension('core/column', {
+	extensionName: 'pulsar-extensions/column/order',
 	attributes: additionalAttributes,
 	classNameGenerator: generateClassNames,
 	Edit: BlockEdit,
