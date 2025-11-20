@@ -1,0 +1,143 @@
+<?php
+/**
+ * Group render class.
+ *
+ * @package Eighteen73\PulsarExtensions
+ */
+
+namespace Eighteen73\PulsarExtensions\Group;
+
+use Eighteen73\PulsarExtensions\Singleton;
+use WP_Block;
+
+/**
+ * Link class.
+ */
+class Link {
+
+	use Singleton;
+
+	/**
+	 * Setup the class.
+	 *
+	 * @return void
+	 */
+	public function setup(): void {
+		add_filter( 'render_block_core/group', [ $this, 'render_link' ], 10, 3 );
+	}
+
+	/**
+	 * Render the link overlay in the group block.
+	 *
+	 * @param string               $block_content The block content.
+	 * @param array<string, mixed> $block         The full block, including name and attributes.
+	 * @param WP_Block|null        $instance      The block instance which carries block context.
+	 *
+	 * @return string The updated block content.
+	 */
+	public function render_link( string $block_content, array $block, ?WP_Block $instance ): string {
+		if ( empty( $block_content ) || empty( $block['attrs'] ) || ! is_array( $block['attrs'] ) ) {
+			return $block_content;
+		}
+
+		$attributes = $block['attrs'];
+		$url        = $this->resolve_link_url( $attributes, $instance );
+		$classes    = 'wp-block-group__link';
+
+		if ( ! empty( $attributes['linkClass'] ) ) {
+			$classes .= ' ' . $attributes['linkClass'];
+		}
+
+		if ( empty( $url ) ) {
+			return $block_content;
+		}
+
+		$link_markup = $this->build_link_markup(
+			$url,
+			$classes,
+			$attributes['linkTarget'] ?? '',
+			$attributes['rel'] ?? ''
+		);
+
+		return $this->inject_link_markup( $block_content, $link_markup );
+	}
+
+	/**
+	 * Determine the correct link URL based on the block attributes.
+	 *
+	 * @param array<string, mixed> $attributes The group block attributes.
+	 * @param WP_Block|null        $instance   The block instance which contains context.
+	 *
+	 * @return string
+	 */
+	private function resolve_link_url( array $attributes, ?WP_Block $instance ): string {
+		$link_destination = $attributes['linkDestination'] ?? '';
+
+		if ( 'post' === $link_destination ) {
+			$post_id = 0;
+
+			if ( $instance instanceof WP_Block && isset( $instance->context['postId'] ) ) {
+				$post_id = (int) $instance->context['postId'];
+			}
+
+			if ( ! $post_id ) {
+				$post_id = get_the_ID();
+			}
+
+			if ( $post_id ) {
+				$permalink = get_permalink( $post_id );
+				return is_string( $permalink ) ? $permalink : '';
+			}
+
+			return '';
+		}
+
+		if ( ! empty( $attributes['url'] ) && is_string( $attributes['url'] ) ) {
+			return $attributes['url'];
+		}
+
+		return '';
+	}
+
+	/**
+	 * Build the anchor markup that overlays the group block.
+	 *
+	 * @param string $url The link destination.
+	 * @param string $link_class Optional CSS class attribute.
+	 * @param string $link_target Optional target attribute.
+	 * @param string $link_rel Optional rel attribute.
+	 *
+	 * @return string
+	 */
+	private function build_link_markup( string $url, string $link_class, string $link_target, string $link_rel ): string {
+		$class_attr  = $link_class ? sprintf( ' class="%s"', esc_attr( $link_class ) ) : '';
+		$target_attr = $link_target ? sprintf( ' target="%s"', esc_attr( $link_target ) ) : '';
+		$rel_attr    = $link_rel ? sprintf( ' rel="%s"', esc_attr( $link_rel ) ) : '';
+
+		return sprintf(
+			'<a title="my link" href="%1$s"%2$s%3$s%4$s></a>',
+			esc_url( $url ),
+			$class_attr,
+			$target_attr,
+			$rel_attr
+		);
+	}
+
+	/**
+	 * Inject the anchor immediately after the first opening tag in the block markup.
+	 *
+	 * @param string $block_content The existing block markup.
+	 * @param string $link_markup The link markup to insert.
+	 *
+	 * @return string
+	 */
+	private function inject_link_markup( string $block_content, string $link_markup ): string {
+		$insertion_point = strpos( $block_content, '>' );
+
+		if ( false === $insertion_point ) {
+			return $block_content;
+		}
+
+		return substr_replace( $block_content, $link_markup, $insertion_point + 1, 0 );
+	}
+}

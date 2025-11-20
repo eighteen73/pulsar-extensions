@@ -7,6 +7,9 @@
 
 namespace Eighteen73\PulsarExtensions;
 
+use Eighteen73\PulsarExtensions\Api;
+use Eighteen73\PulsarExtensions\Group;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -38,8 +41,12 @@ class Plugin {
 	public function setup(): void {
 		add_action( 'init', [ $this, 'load_textdomain' ] );
 		add_action( 'init', [ $this, 'register_block_styles' ] );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_global_editor_scripts' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_scripts' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_editor_styles' ] );
+
+		Api\Icons::instance()->setup();
+		Group\Link::instance()->setup();
 	}
 
 	/**
@@ -62,6 +69,7 @@ class Plugin {
 	 */
 	public static function activation(): void {
 		delete_transient( self::CACHE_KEY );
+		Api\Icons::instance()->clear_icons_cache();
 	}
 
 	/**
@@ -71,6 +79,7 @@ class Plugin {
 	 */
 	public static function deactivation(): void {
 		delete_transient( self::CACHE_KEY );
+		Api\Icons::instance()->clear_icons_cache();
 	}
 
 	/**
@@ -79,10 +88,15 @@ class Plugin {
 	 * @return array<string, array<string>> Array of block names with their extensions.
 	 */
 	private function get_available_extensions(): array {
-		// Check for cached extensions.
-		$cached = get_transient( self::CACHE_KEY );
-		if ( false !== $cached && is_array( $cached ) ) {
-			return $cached;
+		// Bypass cache in development environments.
+		$is_development = self::is_development_mode();
+
+		// Check for cached extensions (skip in development).
+		if ( ! $is_development ) {
+			$cached = get_transient( self::CACHE_KEY );
+			if ( false !== $cached && is_array( $cached ) ) {
+				return $cached;
+			}
 		}
 
 		$extensions = [];
@@ -115,8 +129,10 @@ class Plugin {
 			}
 		}
 
-		// Cache the results.
-		set_transient( self::CACHE_KEY, $extensions, self::CACHE_EXPIRATION );
+		// Cache the results (skip in development).
+		if ( ! $is_development ) {
+			set_transient( self::CACHE_KEY, $extensions, self::CACHE_EXPIRATION );
+		}
 
 		return $extensions;
 	}
@@ -158,6 +174,7 @@ class Plugin {
 	 */
 	private function get_block_name_for_folder( string $folder ): string {
 		$default_map = [
+			'button'  => 'core/button',
 			'column'  => 'core/column',
 			'columns' => 'core/columns',
 			'group'   => 'core/group',
@@ -175,6 +192,44 @@ class Plugin {
 		$map = apply_filters( 'pulsar_extensions_block_name_map', $default_map );
 
 		return $map[ $folder ] ?? "core/{$folder}";
+	}
+
+	/**
+	 * Enqueue global editor scripts.
+	 *
+	 * These scripts are loaded globally in the block editor and are not tied to specific blocks.
+	 *
+	 * @return void
+	 */
+	public function enqueue_global_editor_scripts(): void {
+		$global_scripts = [
+			'editor/register-icons',
+		];
+
+		foreach ( $global_scripts as $script_name ) {
+			$asset_path  = PULSAR_EXTENSIONS_PATH . "build/{$script_name}.asset.php";
+			$script_path = PULSAR_EXTENSIONS_PATH . "build/{$script_name}.js";
+
+			// Check if asset files exist.
+			if ( ! file_exists( $asset_path ) || ! file_exists( $script_path ) ) {
+				continue;
+			}
+
+			// Load asset file.
+			$asset = require $asset_path;
+
+			// Enqueue script.
+			$script_handle = 'pulsar-extensions-' . str_replace( '/', '-', $script_name );
+			wp_enqueue_script(
+				$script_handle,
+				PULSAR_EXTENSIONS_URL . "build/{$script_name}.js",
+				$asset['dependencies'],
+				$asset['version'],
+				[
+					'in_footer' => true,
+				]
+			);
+		}
 	}
 
 	/**
@@ -307,6 +362,23 @@ class Plugin {
 				// The RTL file will be loaded automatically if it exists.
 			}
 		}
+	}
+
+	/**
+	 * Check if the current environment is a development environment.
+	 *
+	 * @return bool True if in development mode, false otherwise.
+	 */
+	public static function is_development_mode(): bool {
+		// Check WP_DEVELOPMENT_MODE (WordPress 6.3+).
+		if ( defined( 'WP_DEVELOPMENT_MODE' ) ) {
+			$development_mode = constant( 'WP_DEVELOPMENT_MODE' );
+			if ( in_array( $development_mode, [ 'all', 'plugin' ], true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

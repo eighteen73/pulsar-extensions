@@ -8,6 +8,7 @@ import {
 import { PanelBody } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
@@ -75,6 +76,11 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 		<InspectorControls group="settings">
 			<PanelBody>
 				<FlexOrderControl
+					label={__('Order when stacked', 'pulsar-extensions')}
+					helpText={__(
+						'Choose the display order for this column when stacked.',
+						'pulsar-extensions'
+					)}
 					value={orderWhenStacked || undefined}
 					itemCount={columnCount}
 					onChange={(value) =>

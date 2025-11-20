@@ -34,7 +34,7 @@ const NEW_TAB_REL = ['noreferrer', 'noopener'];
  * A reusable component for managing link controls in the block toolbar
  *
  * @param {object} props Component props
- * @param {string} props.href The current href value
+ * @param {string} props.url The current url value
  * @param {string} props.linkDestination The current link destination
  * @param {string} props.linkTarget The current link target
  * @param {string} props.rel The current rel attribute
@@ -43,7 +43,7 @@ const NEW_TAB_REL = ['noreferrer', 'noopener'];
  * @returns {JSX.Element} The link control component
  */
 export default function GroupLinkControl({
-	href,
+	url,
 	linkDestination,
 	linkTarget,
 	rel,
@@ -70,7 +70,7 @@ export default function GroupLinkControl({
 		const nextFocusTarget =
 			focus.focusable.find(wrapperRef.current)[0] || wrapperRef.current;
 		nextFocusTarget.focus();
-	}, [isEditingLink, href, isLinkingToPost]);
+	}, [isEditingLink, url, isLinkingToPost]);
 
 	// Link control functions
 	const openLinkUI = () => {
@@ -82,7 +82,7 @@ export default function GroupLinkControl({
 			// Clear the link to post destination when editing
 			setAttributes({
 				linkDestination: LINK_DESTINATION_NONE,
-				href: '',
+				url: '',
 			});
 			setUrlInput('');
 		}
@@ -110,7 +110,7 @@ export default function GroupLinkControl({
 		];
 	};
 
-	const onSetHref = (value) => {
+	const onSetUrl = (value) => {
 		const linkDestinations = getLinkDestinations();
 		let linkDestinationInput;
 		if (!value) {
@@ -124,7 +124,7 @@ export default function GroupLinkControl({
 		}
 		setAttributes({
 			linkDestination: linkDestinationInput,
-			href: value,
+			url: value,
 		});
 	};
 
@@ -200,7 +200,7 @@ export default function GroupLinkControl({
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl({
-					href: prependHTTP(urlInput),
+					url: prependHTTP(urlInput),
 					linkDestination: selectedDestination,
 				});
 			}
@@ -213,7 +213,7 @@ export default function GroupLinkControl({
 	const onLinkRemove = () => {
 		onChangeUrl({
 			linkDestination: LINK_DESTINATION_NONE,
-			href: '',
+			url: undefined,
 		});
 	};
 
@@ -252,7 +252,7 @@ export default function GroupLinkControl({
 		</VStack>
 	);
 
-	const linkEditorValue = urlInput !== null ? urlInput : href;
+	const linkEditorValue = urlInput !== null ? urlInput : url;
 	const showLinkEditor = !linkEditorValue && !isLinkingToPost;
 
 	const urlLabel =
@@ -261,12 +261,12 @@ export default function GroupLinkControl({
 			: undefined;
 
 	const PopoverChildren = () => {
-		if ((href || isLinkingToPost) && !isEditingLink) {
+		if ((url || isLinkingToPost) && !isEditingLink) {
 			return (
 				<>
 					<URLPopover.LinkViewer
 						className="block-editor-format-toolbar__link-container-content"
-						url={href || '#'}
+						url={url || '#'}
 						onEditLinkClick={startEditLink}
 						urlLabel={urlLabel}
 					/>
@@ -302,7 +302,7 @@ export default function GroupLinkControl({
 				aria-expanded={isOpen}
 				onClick={openLinkUI}
 				ref={setPopoverAnchor}
-				isActive={!!href || isLinkingToPost}
+				isActive={!!url || isLinkingToPost}
 			/>
 
 			{isOpen && (
@@ -323,7 +323,7 @@ export default function GroupLinkControl({
 										onClick={() => {
 											setUrlInput(null);
 											onChangeUrl({
-												href: '',
+												url: undefined,
 												linkDestination:
 													link.linkDestination,
 											});

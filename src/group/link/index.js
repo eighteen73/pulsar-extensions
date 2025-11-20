@@ -7,8 +7,7 @@ import { BlockControls } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import LinkControl from '../../components/link-control';
-import './editor.scss';
-import './style.scss';
+// import './style.scss';
 
 /**
  * External dependencies
@@ -20,7 +19,7 @@ import clsx from 'clsx';
  * additional block attributes object
  */
 const additionalAttributes = {
-	href: {
+	url: {
 		type: 'string',
 	},
 	linkDestination: {
@@ -45,12 +44,12 @@ const additionalAttributes = {
  */
 function BlockEdit(props) {
 	const { attributes, setAttributes } = props;
-	const { href, linkDestination, linkTarget, rel, linkClass } = attributes;
+	const { url, linkDestination, linkTarget, rel, linkClass } = attributes;
 
 	return (
 		<BlockControls group="block">
 			<LinkControl
-				href={href}
+				url={url}
 				linkDestination={linkDestination}
 				linkTarget={linkTarget}
 				rel={rel}
@@ -68,10 +67,10 @@ function BlockEdit(props) {
  * @returns {string}
  */
 function generateClassNames(attributes) {
-	const { href, linkDestination, linkClass } = attributes;
+	const { url, linkDestination, linkClass } = attributes;
 
 	return clsx({
-		['is-linked']: !!href || linkDestination === 'post',
+		['is-linked']: !!url || linkDestination === 'post',
 		['is-linked-to-post']: linkDestination === 'post',
 		[linkClass]: !!linkClass,
 	});
