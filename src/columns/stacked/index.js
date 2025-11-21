@@ -76,13 +76,13 @@ function BlockEdit({ attributes, setAttributes }) {
  * @returns {string}
  */
 function generateClassNames(attributes) {
-	const { isStackedOnMobile, isReversedOnMobile, stackBreakpoint } =
+	const { isStackedOnMobile, isReversedOnMobile, stackedBreakpoint } =
 		attributes;
 
 	return clsx({
 		'is-reversed-when-stacked': isReversedOnMobile,
-		[`is-stacked-on-${stackBreakpoint}`]:
-			isStackedOnMobile && !!stackBreakpoint,
+		[`is-stacked-on-${stackedBreakpoint}`]:
+			isStackedOnMobile && !!stackedBreakpoint,
 	});
 }
 
