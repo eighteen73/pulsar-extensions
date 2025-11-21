@@ -61,7 +61,7 @@ function BlockEdit(props) {
 							minRows={0}
 							maxRows={5}
 						>
-							{({ value, onChange, index }) => (
+							{(value, onChange, index) => (
 								<div
 									key={index}
 									style={{ marginBottom: '16px' }}
