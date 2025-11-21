@@ -144,11 +144,18 @@ function BlockEdit(props) {
 									'pulsar-extensions'
 								)}
 								checked={unstickOnMobile || false}
-								onChange={(value) =>
-									setAttributes({
-										unstickOnMobile: value,
-									})
-								}
+								onChange={(value) => {
+									if (value && !unstickBreakpoint) {
+										setAttributes({
+											unstickOnMobile: true,
+											unstickBreakpoint: 'lg',
+										});
+									} else {
+										setAttributes({
+											unstickOnMobile: value,
+										});
+									}
+								}}
 							/>
 
 							{unstickOnMobile && (
@@ -158,11 +165,11 @@ function BlockEdit(props) {
 										'pulsar-extensions'
 									)}
 									value={unstickBreakpoint || 'lg'}
-									onChange={(value) =>
+									onChange={(value) => {
 										setAttributes({
 											unstickBreakpoint: value,
-										})
-									}
+										});
+									}}
 								/>
 							)}
 						</VStack>
@@ -185,14 +192,17 @@ function generateClassNames(attributes) {
 		stickyOffset,
 		unstickOnMobile,
 		unstickBreakpoint,
+		style,
 	} = attributes;
 
+	const isSticky = style?.position?.type === 'sticky';
+
 	return clsx({
-		['is-sticky-hidden-on-scroll-down']: stickyOnScrollUp,
-		[`is-sticky-offset-${stickyOffset}`]: stickyOffset,
-		['is-unstuck-on-mobile']: unstickOnMobile,
+		['is-sticky-hidden-on-scroll-down']: stickyOnScrollUp && isSticky,
+		[`is-sticky-offset-${stickyOffset}`]: stickyOffset && isSticky,
+		['is-unstuck-on-mobile']: unstickOnMobile && isSticky,
 		[`is-unstuck-on-${unstickBreakpoint}`]:
-			unstickOnMobile && !!unstickBreakpoint,
+			unstickOnMobile && !!unstickBreakpoint && isSticky,
 	});
 }
 

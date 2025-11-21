@@ -66,8 +66,14 @@ function BlockEdit(props) {
 							checked={isStackedOnMobile || false}
 							disabled={isFlexWrapEnabled}
 							onChange={() => {
+								const newValue = !isStackedOnMobile;
 								setAttributes({
-									isStackedOnMobile: !isStackedOnMobile,
+									isStackedOnMobile: newValue,
+									// Assign default breakpoint if toggled on and none exists
+									stackedBreakpoint:
+										newValue && !stackedBreakpoint
+											? 'md'
+											: stackedBreakpoint,
 								});
 							}}
 						/>
