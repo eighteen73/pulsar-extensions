@@ -306,7 +306,7 @@ class IconRegistry {
 				$selector = $this->get_icon_selector( $set_name, $icon_name );
 
 				$css .= sprintf(
-					'%1$s{--pulsar-icon:%2$s;}',
+					'%1$s{--icon:%2$s;}',
 					$selector,
 					$mask_url
 				);

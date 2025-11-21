@@ -19,6 +19,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
+import ColorControl from '../../components/color-control';
 import './style.scss';
 
 /**
@@ -47,40 +48,55 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 	const { icon, iconPosition, iconColor } = attributes;
 
 	return (
-		<InspectorControls group="settings">
-			<PanelBody title={__('Icon', 'pulsar-extensions')}>
-				<IconPicker
-					value={icon}
-					onChange={(value) =>
-						setAttributes({
-							icon: value,
-							iconPosition: !iconPosition
-								? 'after'
-								: iconPosition,
-						})
-					}
-					iconSet="material-design"
-				/>
+		<>
+			<InspectorControls group="settings">
+				<PanelBody title={__('Icon', 'pulsar-extensions')}>
+					<IconPicker
+						value={icon}
+						onChange={(value) =>
+							setAttributes({
+								icon: value,
+								iconPosition: !iconPosition
+									? 'after'
+									: iconPosition,
+							})
+						}
+						iconSet="material-design"
+					/>
 
-				<ToggleGroupControl
-					label={__('Icon position', 'pulsar-extensions')}
-					value={iconPosition || 'after'}
-					onChange={(value) => setAttributes({ iconPosition: value })}
-					isBlock
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-				>
-					<ToggleGroupControlOption
-						value="before"
-						label={__('Before', 'pulsar-extensions')}
-					/>
-					<ToggleGroupControlOption
-						value="after"
-						label={__('After', 'pulsar-extensions')}
-					/>
-				</ToggleGroupControl>
-			</PanelBody>
-		</InspectorControls>
+					<ToggleGroupControl
+						label={__('Icon position', 'pulsar-extensions')}
+						value={iconPosition || 'after'}
+						onChange={(value) =>
+							setAttributes({ iconPosition: value })
+						}
+						isBlock
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+					>
+						<ToggleGroupControlOption
+							value="before"
+							label={__('Before', 'pulsar-extensions')}
+						/>
+						<ToggleGroupControlOption
+							value="after"
+							label={__('After', 'pulsar-extensions')}
+						/>
+					</ToggleGroupControl>
+				</PanelBody>
+			</InspectorControls>
+
+			<InspectorControls group="color">
+				<ColorControl
+					label={__('Icon', 'pulsar-extensions')}
+					value={iconColor}
+					onChange={(value, slug) =>
+						setAttributes({ iconColor: slug })
+					}
+					panelId={clientId}
+				/>
+			</InspectorControls>
+		</>
 	);
 }
 
@@ -103,15 +119,32 @@ function generateClassNames(attributes) {
 		'has-icon': hasIcon,
 		'has-icon-before': hasIcon && !isAfter,
 		'has-icon-after': hasIcon && isAfter,
-		[`has-icon-color-${iconColor}`]: iconColor,
+		'has-icon-color': iconColor,
 		[iconClass]: Boolean(iconClass),
 	});
+}
+
+/**
+ * generateInlineStyles
+ *
+ * a function to generate the new inline styles object that should get added to
+ * the wrapping element of the block.
+ *
+ * @param {object} attributes block attributes
+ * @returns {string}
+ */
+function generateInlineStyles(attributes) {
+	const { iconColor } = attributes;
+	return iconColor
+		? { '--icon-color': `var(--wp--preset--color--${iconColor})` }
+		: null;
 }
 
 registerBlockExtension('core/button', {
 	extensionName: 'pulsar-extensions/button/icon',
 	attributes: additionalAttributes,
 	classNameGenerator: generateClassNames,
+	inlineStyleGenerator: generateInlineStyles,
 	Edit: BlockEdit,
 	order: 'after',
 });
