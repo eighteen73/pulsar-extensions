@@ -27,6 +27,7 @@ defined( 'ABSPATH' ) || exit;
 define( 'PULSAR_EXTENSIONS_URL', plugin_dir_url( __FILE__ ) );
 define( 'PULSAR_EXTENSIONS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'PULSAR_EXTENSIONS_INC', PULSAR_EXTENSIONS_PATH . 'includes/' );
+define( 'PULSAR_EXTENSIONS_VERSION', '0.1.0' );
 
 // Require the autoloader.
 $autoloader = PULSAR_EXTENSIONS_PATH . '/vendor/autoload.php';

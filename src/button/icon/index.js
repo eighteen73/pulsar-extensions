@@ -15,6 +15,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
+import './style.scss';
 
 /**
  * additional block attributes object
@@ -62,12 +63,19 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
  */
 function generateClassNames(attributes) {
 	const { icon, iconPosition, iconColor } = attributes;
+	const hasIcon = Boolean(icon);
+	const isAfter = iconPosition === 'after';
+	const iconClass =
+		icon?.iconSet && icon?.name
+			? `has-icon-${icon.iconSet}-${icon.name}`
+			: null;
 
 	return clsx({
-		[`has-icon`]: icon,
-		[`has-icon-${icon?.name}`]: icon?.name,
-		[`has-icon-${iconPosition}`]: iconPosition,
+		'has-icon': hasIcon,
+		'has-icon-before': hasIcon && !isAfter,
+		'has-icon-after': hasIcon && isAfter,
 		[`has-icon-color-${iconColor}`]: iconColor,
+		[iconClass]: Boolean(iconClass),
 	});
 }
 
