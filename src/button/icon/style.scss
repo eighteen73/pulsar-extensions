@@ -1,0 +1,30 @@
+.wp-block-button:where(.has-icon) {
+	.wp-block-button__link {
+		&::before,
+		&::after {
+			background-color: currentcolor;
+			height: 1em;
+			mask-image: var(--pulsar-icon);
+			mask-position: center;
+			mask-repeat: no-repeat;
+			mask-size: contain;
+			width: 1em;
+		}
+	}
+
+	&.has-icon-before {
+		.wp-block-button__link {
+			&::before {
+				content: "";
+			}
+		}
+	}
+
+	&.has-icon-after {
+		.wp-block-button__link {
+			&::after {
+				content: "";
+			}
+		}
+	}
+}

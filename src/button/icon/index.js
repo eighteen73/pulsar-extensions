@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
+import {
+	PanelBody,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -47,9 +51,34 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 			<PanelBody title={__('Icon', 'pulsar-extensions')}>
 				<IconPicker
 					value={icon}
-					onChange={(value) => setAttributes({ icon: value })}
+					onChange={(value) =>
+						setAttributes({
+							icon: value,
+							iconPosition: !iconPosition
+								? 'after'
+								: iconPosition,
+						})
+					}
 					iconSet="material-design"
 				/>
+
+				<ToggleGroupControl
+					label={__('Icon position', 'pulsar-extensions')}
+					value={iconPosition || 'after'}
+					onChange={(value) => setAttributes({ iconPosition: value })}
+					isBlock
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				>
+					<ToggleGroupControlOption
+						value="before"
+						label={__('Before', 'pulsar-extensions')}
+					/>
+					<ToggleGroupControlOption
+						value="after"
+						label={__('After', 'pulsar-extensions')}
+					/>
+				</ToggleGroupControl>
 			</PanelBody>
 		</InspectorControls>
 	);
