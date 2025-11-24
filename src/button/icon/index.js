@@ -20,6 +20,7 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import ColorControl from '../../components/color-control';
+import './editor.scss';
 import './style.scss';
 
 /**
@@ -52,6 +53,7 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 			<InspectorControls group="settings">
 				<PanelBody title={__('Icon', 'pulsar-extensions')}>
 					<IconPicker
+						className="pulsar-extensions-icon-picker"
 						value={icon}
 						onChange={(value) =>
 							setAttributes({

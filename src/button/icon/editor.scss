@@ -1,0 +1,8 @@
+.pulsar-extensions-icon-picker {
+	.component-icon-picker__list {
+		> * {
+			height: auto !important; // stylelint-disable-line declaration-no-important
+			max-height: 200px;
+		}
+	}
+}
