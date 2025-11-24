@@ -40,6 +40,7 @@ function BlockEdit(props) {
 	const { layout, responsiveColumns = [] } = attributes;
 
 	const isGridLayout = layout?.type === 'grid';
+	const isManualMode = layout?.minimumColumnWidth === null;
 	const allBreakpoints = Object.keys(breakpoints);
 	const defaultColumnCount = 3;
 
@@ -57,7 +58,7 @@ function BlockEdit(props) {
 
 	return (
 		<>
-			{isGridLayout && (
+			{isGridLayout && isManualMode && (
 				<InspectorControls group="settings">
 					<PanelBody
 						title={__('Responsive layout', 'pulsar-extensions')}
@@ -173,19 +174,25 @@ function BlockEdit(props) {
  * @returns {string}
  */
 function generateClassNames(attributes) {
-	const { responsiveColumns = [] } = attributes;
+	const { layout, responsiveColumns = [] } = attributes;
 
-	// Build an object of classes from the responsiveColumns array
-	const classObject = {};
+	const isGridLayout = layout?.type === 'grid';
+	const isManualMode = layout?.minimumColumnWidth === null;
 
-	responsiveColumns.forEach((item) => {
-		if (item?.breakpoint && item?.columnCount) {
-			classObject[`grid-columns-${item.breakpoint}-${item.columnCount}`] =
-				true;
-		}
-	});
+	if (isGridLayout && isManualMode) {
+		// Build an object of classes from the responsiveColumns array
+		const classObject = {};
 
-	return clsx(classObject);
+		responsiveColumns.forEach((item) => {
+			if (item?.breakpoint && item?.columnCount) {
+				classObject[
+					`grid-columns-${item.breakpoint}-${item.columnCount}`
+				] = true;
+			}
+		});
+
+		return clsx(classObject);
+	}
 }
 
 registerBlockExtension('core/group', {
