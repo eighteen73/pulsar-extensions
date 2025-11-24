@@ -14,6 +14,7 @@ import BreakpointSelectionControl from '../../components/breakpoint-selection-co
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 import { Repeater } from '@10up/block-components/components/repeater';
 import clsx from 'clsx';
+import breakpoints from '../../constants/breakpoints';
 
 /**
  * additional block attributes object
@@ -36,7 +37,7 @@ function BlockEdit(props) {
 	const { layout, responsiveColumns = [] } = attributes;
 
 	const isGridLayout = layout?.type === 'grid';
-	const allBreakpoints = ['xs', 'sm', 'md', 'lg'];
+	const allBreakpoints = Object.keys(breakpoints);
 	const defaultColumnCount = 3;
 
 	const AddBreakpointButton = (addItem) => {
@@ -116,15 +117,12 @@ function BlockEdit(props) {
 											'Breakpoint',
 											'pulsar-extensions'
 										)}
-										breakpoints={allBreakpoints.filter(
-											(bp) =>
-												bp === value.breakpoint ||
-												!responsiveColumns.some(
-													(row) =>
-														row.breakpoint === bp &&
-														row.id !== value.id
-												)
-										)}
+										breakpoints={allBreakpoints}
+										disabledBreakpoints={responsiveColumns
+											.map((row) => row.breakpoint)
+											.filter(
+												(bp) => bp !== value.breakpoint
+											)}
 									/>
 
 									<GridColumnsControl

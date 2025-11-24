@@ -24,6 +24,7 @@ const BreakpointSelectionControl = ({
 	onChange,
 	breakpoints = DEFAULT_BREAKPOINTS,
 	helpTextMap = DEFAULT_HELP_TEXT,
+	disabledBreakpoints = [],
 }) => {
 	const activeValue = value ?? breakpoints[0];
 
@@ -48,6 +49,10 @@ const BreakpointSelectionControl = ({
 					key={breakpoint}
 					value={breakpoint}
 					label={breakpoint.toUpperCase()}
+					disabled={
+						disabledBreakpoints.includes(breakpoint) &&
+						breakpoint !== activeValue
+					}
 				/>
 			))}
 		</ToggleGroupControl>
