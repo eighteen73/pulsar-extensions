@@ -52,11 +52,21 @@ class Link {
 			return $block_content;
 		}
 
+		// Find headings in content and order by standard order to prioritise more important headings
+		$heading_content = '';
+		for ( $i = 1; $i <= 6; $i++ ) {
+			if ( preg_match( sprintf( '/<h%d[^>]*>(.*?)<\/h%d>/si', $i, $i ), $block_content, $matches ) ) {
+				$heading_content = wp_strip_all_tags( $matches[1] );
+				break; // stop at the first heading found
+			}
+		}
+
 		$link_markup = $this->build_link_markup(
 			$url,
 			$classes,
 			$attributes['linkTarget'] ?? '',
-			$attributes['rel'] ?? ''
+			$attributes['rel'] ?? '',
+			$heading_content
 		);
 
 		return $this->inject_link_markup( $block_content, $link_markup );
@@ -106,20 +116,22 @@ class Link {
 	 * @param string $link_class Optional CSS class attribute.
 	 * @param string $link_target Optional target attribute.
 	 * @param string $link_rel Optional rel attribute.
+	 * @param string $heading_content Content from the most important heading within the $block_content.
 	 *
 	 * @return string
 	 */
-	private function build_link_markup( string $url, string $link_class, string $link_target, string $link_rel ): string {
+	private function build_link_markup( string $url, string $link_class, string $link_target, string $link_rel, string $heading_content ): string {
 		$class_attr  = $link_class ? sprintf( ' class="%s"', esc_attr( $link_class ) ) : '';
 		$target_attr = $link_target ? sprintf( ' target="%s"', esc_attr( $link_target ) ) : '';
 		$rel_attr    = $link_rel ? sprintf( ' rel="%s"', esc_attr( $link_rel ) ) : '';
 
 		return sprintf(
-			'<a title="my link" href="%1$s"%2$s%3$s%4$s></a>',
+			'<a title="%5$s" href="%1$s"%2$s%3$s%4$s></a>',
 			esc_url( $url ),
 			$class_attr,
 			$target_attr,
-			$rel_attr
+			$rel_attr,
+			$heading_content
 		);
 	}
 
