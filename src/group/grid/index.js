@@ -36,10 +36,19 @@ function BlockEdit(props) {
 	const { layout, responsiveColumns = [] } = attributes;
 
 	const isGridLayout = layout?.type === 'grid';
+	const allBreakpoints = ['xs', 'sm', 'md', 'lg'];
+	const defaultColumnCount = 3;
 
-	const defaultValues = {
-		breakpoint: 'lg',
-		columnCount: 3,
+	const AddBreakpointButton = (addItem) => {
+		if (responsiveColumns.length >= allBreakpoints.length) {
+			return null;
+		}
+
+		return (
+			<Button variant="primary" onClick={() => addItem()}>
+				{__('Add breakpoint', 'pulsar-extensions')}
+			</Button>
+		);
 	};
 
 	return (
@@ -53,29 +62,42 @@ function BlockEdit(props) {
 						<Repeater
 							value={responsiveColumns}
 							onChange={(newValue) => {
-								const mergedValues = newValue.map((row) => ({
-									breakpoint:
-										row.breakpoint ??
-										defaultValues.breakpoint,
-									columnCount:
-										row.columnCount ??
-										defaultValues.columnCount,
-									id: row.id,
-								}));
+								// Ensure each row has values, pick a non-duplicate default breakpoint
+								const usedBreakpoints = newValue
+									.map((row) => row.breakpoint)
+									.filter(Boolean);
+
+								const mergedValues = newValue.map((row) => {
+									let breakpoint = row.breakpoint;
+
+									// If no breakpoint, pick the first unused one
+									if (!breakpoint) {
+										const available = allBreakpoints.filter(
+											(bp) =>
+												!usedBreakpoints.includes(bp)
+										);
+										breakpoint =
+											available[available.length - 1] ||
+											allBreakpoints[
+												allBreakpoints.length - 1
+											];
+										usedBreakpoints.push(breakpoint);
+									}
+
+									return {
+										...row,
+										breakpoint,
+										columnCount:
+											row.columnCount ??
+											defaultColumnCount,
+									};
+								});
 
 								setAttributes({
 									responsiveColumns: mergedValues,
 								});
 							}}
-							addButtonLabel={__(
-								'Add Breakpoint',
-								'pulsar-extensions'
-							)}
-							defaultRowValues={{
-								...defaultValues,
-							}}
-							minRows={0}
-							maxRows={5}
+							addButton={AddBreakpointButton}
 						>
 							{(value, index, onChange, removeItem) => (
 								<div
@@ -94,7 +116,15 @@ function BlockEdit(props) {
 											'Breakpoint',
 											'pulsar-extensions'
 										)}
-										breakpoints={['xs', 'sm', 'md', 'lg']}
+										breakpoints={allBreakpoints.filter(
+											(bp) =>
+												bp === value.breakpoint ||
+												!responsiveColumns.some(
+													(row) =>
+														row.breakpoint === bp &&
+														row.id !== value.id
+												)
+										)}
 									/>
 
 									<GridColumnsControl
@@ -119,7 +149,10 @@ function BlockEdit(props) {
 											variant="secondary"
 											onClick={removeItem}
 										>
-											{__('Remove Item')}
+											{__(
+												'Remove Item',
+												'pulsar-extensions'
+											)}
 										</Button>
 									</div>
 								</div>
@@ -143,8 +176,6 @@ function generateClassNames(attributes) {
 
 	// Build an object of classes from the responsiveColumns array
 	const classObject = {};
-
-	console.log(responsiveColumns);
 
 	responsiveColumns.forEach((item) => {
 		if (item?.breakpoint && item?.columnCount) {
