@@ -1,5 +1,5 @@
 import { InspectorControls } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
+import { Button, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -37,6 +37,11 @@ function BlockEdit(props) {
 
 	const isGridLayout = layout?.type === 'grid';
 
+	const defaultValues = {
+		breakpoint: 'lg',
+		columnCount: 3,
+	};
+
 	return (
 		<>
 			{isGridLayout && (
@@ -48,20 +53,31 @@ function BlockEdit(props) {
 						<Repeater
 							value={responsiveColumns}
 							onChange={(newValue) => {
-								setAttributes({ responsiveColumns: newValue });
+								const mergedValues = newValue.map((row) => ({
+									breakpoint:
+										row.breakpoint ??
+										defaultValues.breakpoint,
+									columnCount:
+										row.columnCount ??
+										defaultValues.columnCount,
+									id: row.id,
+								}));
+
+								setAttributes({
+									responsiveColumns: mergedValues,
+								});
 							}}
 							addButtonLabel={__(
 								'Add Breakpoint',
 								'pulsar-extensions'
 							)}
 							defaultRowValues={{
-								breakpoint: 'lg',
-								columnCount: 3,
+								...defaultValues,
 							}}
 							minRows={0}
 							maxRows={5}
 						>
-							{(value, index, onChange) => (
+							{(value, index, onChange, removeItem) => (
 								<div
 									key={index}
 									style={{ marginBottom: '16px' }}
@@ -96,6 +112,16 @@ function BlockEdit(props) {
 										min={1}
 										max={16}
 									/>
+
+									<div style={{ marginTop: '16px' }}>
+										<Button
+											isDestructive
+											variant="secondary"
+											onClick={removeItem}
+										>
+											{__('Remove Item')}
+										</Button>
+									</div>
 								</div>
 							)}
 						</Repeater>
@@ -117,6 +143,8 @@ function generateClassNames(attributes) {
 
 	// Build an object of classes from the responsiveColumns array
 	const classObject = {};
+
+	console.log(responsiveColumns);
 
 	responsiveColumns.forEach((item) => {
 		if (item?.breakpoint && item?.columnCount) {
