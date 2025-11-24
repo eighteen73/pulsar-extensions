@@ -41,7 +41,15 @@ function BlockEdit({ attributes, setAttributes }) {
 	return (
 		<InspectorControls group="settings">
 			{isStackedOnMobile && (
-				<div style={{ padding: '0 16px 8px' }}>
+				<div style={{ padding: '0 16px 16px' }}>
+					<BreakpointSelectionControl
+						label={__('Stacked breakpoint', 'pulsar-extensions')}
+						value={stackedBreakpoint || 'md'}
+						onChange={(value) =>
+							setAttributes({ stackedBreakpoint: value })
+						}
+					/>
+
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={__(
@@ -53,14 +61,6 @@ function BlockEdit({ attributes, setAttributes }) {
 							setAttributes({
 								isReversedOnMobile: !isReversedOnMobile,
 							})
-						}
-					/>
-
-					<BreakpointSelectionControl
-						label={__('Stacked breakpoint', 'pulsar-extensions')}
-						value={stackedBreakpoint || 'md'}
-						onChange={(value) =>
-							setAttributes({ stackedBreakpoint: value })
 						}
 					/>
 				</div>
