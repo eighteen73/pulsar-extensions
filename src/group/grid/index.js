@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { InspectorControls } from '@wordpress/block-editor';
 import { Button, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -5,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import breakpoints from '../../constants/breakpoints';
 import GridColumnsControl from '../../components/grid-columns-control';
 import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
 
@@ -14,7 +18,6 @@ import BreakpointSelectionControl from '../../components/breakpoint-selection-co
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 import { Repeater } from '@10up/block-components/components/repeater';
 import clsx from 'clsx';
-import breakpoints from '../../constants/breakpoints';
 
 /**
  * additional block attributes object

@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import {
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -6,29 +9,19 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const DEFAULT_BREAKPOINTS = ['sm', 'md', 'lg', 'xl'];
-
-const DEFAULT_HELP_TEXT = {
-	sm: __('Mobile screens.', 'pulsar-extensions'),
-	md: __('Landscape mobiles and below.', 'pulsar-extensions'),
-	lg: __('Tablets in portrait mode and below.', 'pulsar-extensions'),
-	xl: __(
-		'Smaller laptops or tablets in landscape mode and below.',
-		'pulsar-extensions'
-	),
-};
+/**
+ * Internal dependencies
+ */
+import breakpoints from '../constants/breakpoints';
 
 const BreakpointSelectionControl = ({
 	value,
 	label = __('Screen sizes up to', 'pulsar-extensions'),
 	onChange,
-	breakpoints = DEFAULT_BREAKPOINTS,
-	helpTextMap = DEFAULT_HELP_TEXT,
 	disabledBreakpoints = [],
 }) => {
-	const activeValue = value ?? breakpoints[0];
-
-	const getHelpText = (key) => helpTextMap[key] || '';
+	const breakpointKeys = Object.keys(breakpoints);
+	const activeValue = value ?? breakpointKeys[0];
 
 	const handleChange = (selectedValue) => {
 		if (typeof onChange === 'function') {
@@ -42,16 +35,15 @@ const BreakpointSelectionControl = ({
 			onChange={handleChange}
 			value={activeValue}
 			isBlock
-			help={getHelpText(activeValue)}
+			help={breakpoints[activeValue]?.help}
 		>
-			{breakpoints.map((breakpoint) => (
+			{breakpointKeys.map((key) => (
 				<ToggleGroupControlOption
-					key={breakpoint}
-					value={breakpoint}
-					label={breakpoint.toUpperCase()}
+					key={key}
+					value={key}
+					label={breakpoints[key].label}
 					disabled={
-						disabledBreakpoints.includes(breakpoint) &&
-						breakpoint !== activeValue
+						disabledBreakpoints.includes(key) && key !== activeValue
 					}
 				/>
 			))}
