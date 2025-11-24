@@ -47,9 +47,9 @@ function BlockEdit(props) {
 					>
 						<Repeater
 							value={responsiveColumns}
-							onChange={(newValue) =>
-								setAttributes({ responsiveColumns: newValue })
-							}
+							onChange={(newValue) => {
+								setAttributes({ responsiveColumns: newValue });
+							}}
 							addButtonLabel={__(
 								'Add Breakpoint',
 								'pulsar-extensions'
@@ -61,7 +61,7 @@ function BlockEdit(props) {
 							minRows={0}
 							maxRows={5}
 						>
-							{(value, onChange, index) => (
+							{(value, index, onChange) => (
 								<div
 									key={index}
 									style={{ marginBottom: '16px' }}
