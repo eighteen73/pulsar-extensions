@@ -45,19 +45,6 @@ const additionalAttributes = {
 };
 
 /**
- * Spacing preset options for sticky offset
- */
-const spacingPresetOptions = [
-	{ key: '0', name: __('None', 'pulsar-extensions') },
-	{ key: 'xs', name: __('XS', 'pulsar-extensions') },
-	{ key: 'sm', name: __('Small', 'pulsar-extensions') },
-	{ key: 'md', name: __('Medium', 'pulsar-extensions') },
-	{ key: 'lg', name: __('Large', 'pulsar-extensions') },
-	{ key: 'xl', name: __('XL', 'pulsar-extensions') },
-	{ key: '2xl', name: __('2XL', 'pulsar-extensions') },
-];
-
-/**
  * BlockEdit
  *
  * @param {object} props block props
@@ -72,11 +59,6 @@ function BlockEdit(props) {
 		unstickOnMobile,
 		unstickBreakpoint,
 	} = attributes;
-
-	// Find the selected option based on the current stickyOffset value
-	const selectedStickyOffset = spacingPresetOptions.find(
-		(option) => option.key === (stickyOffset || '0')
-	);
 
 	const spacingPresetsRaw = useSettings([
 		'spacing',
