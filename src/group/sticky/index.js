@@ -1,4 +1,7 @@
-import { InspectorControls } from '@wordpress/block-editor';
+/**
+ * WordPress dependencies
+ */
+import { InspectorControls, useSettings } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	CustomSelectControl,
@@ -75,6 +78,21 @@ function BlockEdit(props) {
 		(option) => option.key === (stickyOffset || '0')
 	);
 
+	const spacingPresetsRaw = useSettings([
+		'spacing',
+		'spacingSizes',
+		'theme',
+	]) || [[]];
+	const spacingPresets = spacingPresetsRaw[0];
+
+	const spacingOptions = [
+		{ key: '0', name: __('None', 'pulsar-extensions') },
+		...spacingPresets.map((preset) => ({
+			key: preset.slug,
+			name: preset.name || preset.slug.toUpperCase(),
+		})),
+	];
+
 	return (
 		<>
 			{attributes?.style?.position?.type === 'sticky' && (
@@ -87,13 +105,16 @@ function BlockEdit(props) {
 									'Distance from the top edge when stuck to the viewport',
 									'pulsar-extensions'
 								)}
-								value={selectedStickyOffset}
+								value={spacingOptions.find(
+									(option) =>
+										option.key === (stickyOffset || '0')
+								)}
 								onChange={({ selectedItem }) => {
 									setAttributes({
 										stickyOffset: selectedItem?.key || null,
 									});
 								}}
-								options={spacingPresetOptions}
+								options={spacingOptions}
 							/>
 							<NumberControl
 								label={__(
