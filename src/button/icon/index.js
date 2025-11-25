@@ -25,17 +25,19 @@ import './style.scss';
 
 /**
  * additional block attributes object
+ * @example
+ * {
+ * 	icon: {
+ * 		position: 'after',
+ * 		color: 'blue',
+ * 		name: 'star',
+ * 		set: 'default',
+ * 	}
+ * }
  */
 const additionalAttributes = {
 	icon: {
 		type: 'object',
-	},
-	iconPosition: {
-		type: 'enum',
-		enum: ['before', 'after'],
-	},
-	iconColor: {
-		type: 'string',
 	},
 };
 
@@ -46,7 +48,25 @@ const additionalAttributes = {
  * @returns {JSX}
  */
 function BlockEdit({ clientId, attributes, setAttributes }) {
-	const { icon, iconPosition, iconColor } = attributes;
+	const { icon } = attributes;
+	// Destructure icon properties with defaults
+	const { position = 'after', color, name, set } = icon || {};
+
+	/**
+	 * Helper to update icon attributes while preserving existing values
+	 *
+	 * @param {object} newAttributes New attributes to merge into the icon object
+	 */
+	const updateIcon = (newAttributes) => {
+		const updatedIcon = { ...icon, ...newAttributes };
+
+		// If selecting an icon for the first time and no position is set, default to 'after'
+		if (newAttributes.name && !updatedIcon.position) {
+			updatedIcon.position = 'after';
+		}
+
+		setAttributes({ icon: updatedIcon });
+	};
 
 	return (
 		<>
@@ -54,24 +74,17 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 				<PanelBody title={__('Icon', 'pulsar-extensions')}>
 					<IconPicker
 						className="pulsar-extensions-icon-picker"
-						value={icon}
-						onChange={(value) =>
-							setAttributes({
-								icon: value,
-								iconPosition: !iconPosition
-									? 'after'
-									: iconPosition,
-							})
-						}
-						iconSet="material-design"
+						value={{ name, iconSet: set }}
+						onChange={(value) => {
+							const { iconSet, ...rest } = value;
+							updateIcon({ ...rest, set: iconSet });
+						}}
 					/>
 
 					<ToggleGroupControl
 						label={__('Icon position', 'pulsar-extensions')}
-						value={iconPosition || 'after'}
-						onChange={(value) =>
-							setAttributes({ iconPosition: value })
-						}
+						value={position}
+						onChange={(value) => updateIcon({ position: value })}
 						isBlock
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
@@ -91,10 +104,8 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 			<InspectorControls group="color">
 				<ColorControl
 					label={__('Icon', 'pulsar-extensions')}
-					value={iconColor}
-					onChange={(value, slug) =>
-						setAttributes({ iconColor: slug })
-					}
+					value={color}
+					onChange={(value, slug) => updateIcon({ color: slug })}
 					panelId={clientId}
 				/>
 			</InspectorControls>
@@ -109,19 +120,19 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
  * @returns {string}
  */
 function generateClassNames(attributes) {
-	const { icon, iconPosition, iconColor } = attributes;
-	const hasIcon = Boolean(icon);
-	const isAfter = iconPosition === 'after';
-	const iconClass =
-		icon?.iconSet && icon?.name
-			? `has-icon-${icon.iconSet}-${icon.name}`
-			: null;
+	const { icon } = attributes;
+	const { name, set, position, color } = icon || {};
+
+	// Check if we actually have an icon selected
+	const hasIcon = Boolean(name && set);
+	const isAfter = position === 'after';
+	const iconClass = hasIcon ? `has-icon-${set}-${name}` : null;
 
 	return clsx({
 		'has-icon': hasIcon,
 		'has-icon-before': hasIcon && !isAfter,
 		'has-icon-after': hasIcon && isAfter,
-		'has-icon-color': iconColor,
+		'has-icon-color': color,
 		[iconClass]: Boolean(iconClass),
 	});
 }
@@ -136,9 +147,11 @@ function generateClassNames(attributes) {
  * @returns {string}
  */
 function generateInlineStyles(attributes) {
-	const { iconColor } = attributes;
-	return iconColor
-		? { '--icon-color': `var(--wp--preset--color--${iconColor})` }
+	const { icon } = attributes;
+	const { color } = icon || {};
+
+	return color
+		? { '--icon-color': `var(--wp--preset--color--${color})` }
 		: null;
 }
 

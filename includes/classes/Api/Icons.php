@@ -74,7 +74,6 @@ class Icons {
 	 */
 	public function get_icons() {
 		$icon_sets = IconRegistry::instance()->get_icon_sets();
-
 		return rest_ensure_response( $icon_sets );
 	}
 }
