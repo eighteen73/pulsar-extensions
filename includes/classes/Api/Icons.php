@@ -7,8 +7,8 @@
 
 namespace Eighteen73\PulsarExtensions\Api;
 
-use Eighteen73\PulsarExtensions\IconRegistry;
 use Eighteen73\PulsarExtensions\Singleton;
+use Eighteen73\PulsarExtensions\Registries\IconRegistry;
 use WP_REST_Response;
 
 /**

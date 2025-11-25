@@ -5,7 +5,11 @@
  * @package Eighteen73\PulsarExtensions
  */
 
-namespace Eighteen73\PulsarExtensions;
+namespace Eighteen73\PulsarExtensions\Registries;
+
+use Eighteen73\PulsarExtensions\Plugin;
+use Eighteen73\PulsarExtensions\Singleton;
+use Eighteen73\PulsarExtensions\StyleEngine\StylesheetGenerator;
 
 /**
  * Handles discovery and normalization of icon sets.
@@ -283,14 +287,22 @@ class IconRegistry {
 	}
 
 	/**
-	 * Create icon-specific CSS rules for mask custom property values.
+	 * Generate CSS utility classes for icons.
+	 *
+	 * This follows WordPress's class generation pattern from WP_Theme_JSON::compute_preset_classes()
+	 * but adapted for icons that use a local CSS variable approach.
+	 *
+	 * WordPress generates: .has-{slug}-{property} { {property}: var(--wp--preset--{type}--{slug}) !important; }
+	 * This generates: .has-icon-{set}-{name} { --icon: url(...) !important; }
+	 *
+	 * The --icon variable is then consumed by block styles (e.g., mask-image: var(--icon)).
 	 *
 	 * @param array<int, array<string, mixed>> $icon_sets Icon sets.
 	 *
 	 * @return string
 	 */
 	private function get_icon_variable_rules( array $icon_sets ): string {
-		$css = '';
+		$generator = new StylesheetGenerator();
 
 		foreach ( $icon_sets as $icon_set ) {
 			$set_name = $icon_set['name'];
@@ -305,15 +317,18 @@ class IconRegistry {
 
 				$selector = $this->get_icon_selector( $set_name, $icon_name );
 
-				$css .= sprintf(
-					'%1$s{--icon:%2$s;}',
+				// Generate utility class following WordPress pattern.
+				$rule = $generator->generate_utility_class(
 					$selector,
-					$mask_url
+					[ '--icon' => $mask_url ],
+					true
 				);
+
+				$generator->add_rule( $rule );
 			}
 		}
 
-		return $css;
+		return $generator->get_stylesheet();
 	}
 
 	/**
@@ -336,6 +351,9 @@ class IconRegistry {
 
 	/**
 	 * Build the CSS selector for a specific icon.
+	 *
+	 * Follows WordPress pattern: .has-{slug}-{property}
+	 * Example: .has-icon-default-arrow-right
 	 *
 	 * @param string $icon_set Icon set slug.
 	 * @param string $icon     Icon slug.

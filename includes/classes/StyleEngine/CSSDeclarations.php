@@ -121,6 +121,6 @@ class CSSDeclarations {
 	 * @return string The sanitized property.
 	 */
 	protected function sanitize_property( string $property ): string {
-		return trim( strip_tags( $property ) );
+		return trim( wp_strip_all_tags( $property ) );
 	}
 }

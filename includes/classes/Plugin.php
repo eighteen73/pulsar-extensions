@@ -8,8 +8,9 @@
 namespace Eighteen73\PulsarExtensions;
 
 use Eighteen73\PulsarExtensions\Api;
-use Eighteen73\PulsarExtensions\Group;
-use Eighteen73\PulsarExtensions\IconRegistry;
+use Eighteen73\PulsarExtensions\Extensions\Group;
+use Eighteen73\PulsarExtensions\Registries\IconRegistry;
+use Eighteen73\PulsarExtensions\Registries\StickyOffsetRegistry;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -43,6 +44,7 @@ class Plugin {
 		add_action( 'init', [ $this, 'load_textdomain' ] );
 		add_action( 'init', [ $this, 'register_block_styles' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_icon_styles' ] );
+		add_action( 'enqueue_block_assets', [ $this, 'enqueue_sticky_offset_styles' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_global_editor_scripts' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_scripts' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_editor_styles' ] );
@@ -72,6 +74,7 @@ class Plugin {
 	public static function activation(): void {
 		delete_transient( self::CACHE_KEY );
 		IconRegistry::instance()->clear_cache();
+		StickyOffsetRegistry::instance()->clear_cache();
 	}
 
 	/**
@@ -82,6 +85,7 @@ class Plugin {
 	public static function deactivation(): void {
 		delete_transient( self::CACHE_KEY );
 		IconRegistry::instance()->clear_cache();
+		StickyOffsetRegistry::instance()->clear_cache();
 	}
 
 	/**
@@ -253,6 +257,36 @@ class Plugin {
 		}
 
 		$handle = 'pulsar-extensions-icon-utilities';
+
+		if ( ! wp_style_is( $handle, 'registered' ) ) {
+			wp_register_style( $handle, false, [], PULSAR_EXTENSIONS_VERSION );
+		}
+
+		wp_enqueue_style( $handle );
+		wp_add_inline_style( $handle, $css );
+
+		$enqueued = true;
+	}
+
+	/**
+	 * Enqueue sticky offset utility styles for both editor and front-end.
+	 *
+	 * @return void
+	 */
+	public function enqueue_sticky_offset_styles(): void {
+		static $enqueued = false;
+
+		if ( $enqueued ) {
+			return;
+		}
+
+		$css = StickyOffsetRegistry::instance()->get_sticky_offset_css();
+
+		if ( empty( $css ) ) {
+			return;
+		}
+
+		$handle = 'pulsar-extensions-sticky-offset-utilities';
 
 		if ( ! wp_style_is( $handle, 'registered' ) ) {
 			wp_register_style( $handle, false, [], PULSAR_EXTENSIONS_VERSION );

@@ -5,7 +5,7 @@
  * @package Eighteen73\PulsarExtensions
  */
 
-namespace Eighteen73\PulsarExtensions\Group;
+namespace Eighteen73\PulsarExtensions\Extensions\Group;
 
 use Eighteen73\PulsarExtensions\Singleton;
 use WP_Block;
