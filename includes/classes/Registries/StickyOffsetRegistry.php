@@ -138,22 +138,11 @@ class StickyOffsetRegistry implements StylesheetRegistryInterface {
 				[
 					'top' => "calc(var(--wp--preset--spacing--{$slug}) + var(--wp-admin--admin-bar--position-offset, 0px))",
 				],
-				false
+				true
 			);
 
 			$generator->add_rule( $rule );
 		}
-
-		// Also generate a "none" option for no offset (just admin bar)
-		$rule = $generator->generate_utility_class(
-			'.is-sticky-offset-0',
-			[
-				'top' => 'calc(0px + var(--wp-admin--admin-bar--position-offset, 0px))',
-			],
-			false
-		);
-
-		$generator->add_rule( $rule );
 
 		return $generator->get_stylesheet();
 	}
