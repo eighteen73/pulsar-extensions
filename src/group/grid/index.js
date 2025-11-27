@@ -51,7 +51,7 @@ function BlockEdit(props) {
 
 		return (
 			<Button variant="primary" onClick={() => addItem()}>
-				{__('Add breakpoint', 'pulsar-extensions')}
+				{__('Add screen size', 'pulsar-extensions')}
 			</Button>
 		);
 	};
@@ -61,7 +61,7 @@ function BlockEdit(props) {
 			{isGridLayout && isManualMode && (
 				<InspectorControls group="settings">
 					<PanelBody
-						title={__('Responsive layout', 'pulsar-extensions')}
+						title={__('Mobile layout', 'pulsar-extensions')}
 						initialOpen={false}
 					>
 						<Repeater
@@ -118,7 +118,7 @@ function BlockEdit(props) {
 											})
 										}
 										label={__(
-											'Breakpoint',
+											'Screen size',
 											'pulsar-extensions'
 										)}
 										breakpoints={allBreakpoints}
@@ -152,7 +152,7 @@ function BlockEdit(props) {
 											onClick={removeItem}
 										>
 											{__(
-												'Remove Item',
+												'Remove screen size',
 												'pulsar-extensions'
 											)}
 										</Button>
