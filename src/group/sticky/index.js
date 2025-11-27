@@ -219,7 +219,10 @@ function generateClassNames(attributes) {
  * @returns {string}
  */
 function generateInlineStyles(attributes) {
-	return '';
+	const { stickyZIndex } = attributes;
+	return {
+		zIndex: stickyZIndex,
+	};
 }
 
 registerBlockExtension('core/group', {
