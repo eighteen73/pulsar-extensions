@@ -43,8 +43,7 @@ class Plugin {
 	public function setup(): void {
 		add_action( 'init', [ $this, 'load_textdomain' ] );
 		add_action( 'init', [ $this, 'register_block_styles' ] );
-		add_action( 'enqueue_block_assets', [ $this, 'enqueue_icon_styles' ] );
-		add_action( 'enqueue_block_assets', [ $this, 'enqueue_sticky_offset_styles' ] );
+		add_action( 'enqueue_block_assets', [ $this, 'enqueue_registry_stylesheets' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_global_editor_scripts' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_scripts' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_editor_styles' ] );
@@ -239,63 +238,56 @@ class Plugin {
 	}
 
 	/**
-	 * Enqueue icon utility styles for both editor and front-end.
+	 * Get all stylesheet registries.
 	 *
-	 * @return void
+	 * Returns an array of all registry instances that implement StylesheetRegistryInterface.
+	 * These will be automatically enqueued by enqueue_registry_stylesheets().
+	 *
+	 * @return Registries\StylesheetRegistryInterface[]
 	 */
-	public function enqueue_icon_styles(): void {
-		static $enqueued = false;
-
-		if ( $enqueued ) {
-			return;
-		}
-
-		$css = IconRegistry::instance()->get_icon_utility_css();
-
-		if ( empty( $css ) ) {
-			return;
-		}
-
-		$handle = 'pulsar-extensions-icon-utilities';
-
-		if ( ! wp_style_is( $handle, 'registered' ) ) {
-			wp_register_style( $handle, false, [], PULSAR_EXTENSIONS_VERSION );
-		}
-
-		wp_enqueue_style( $handle );
-		wp_add_inline_style( $handle, $css );
-
-		$enqueued = true;
+	private function get_stylesheet_registries(): array {
+		return [
+			IconRegistry::instance(),
+			StickyOffsetRegistry::instance(),
+		];
 	}
 
 	/**
-	 * Enqueue sticky offset utility styles for both editor and front-end.
+	 * Enqueue all registry stylesheets.
+	 *
+	 * Loops through all registered stylesheet registries and enqueues their CSS.
+	 * Used for both editor and front-end.
 	 *
 	 * @return void
 	 */
-	public function enqueue_sticky_offset_styles(): void {
-		static $enqueued = false;
+	public function enqueue_registry_stylesheets(): void {
+		static $enqueued = [];
 
-		if ( $enqueued ) {
-			return;
+		foreach ( $this->get_stylesheet_registries() as $registry ) {
+			$handle = $registry->get_handle();
+
+			// Skip if already enqueued
+			if ( isset( $enqueued[ $handle ] ) ) {
+				continue;
+			}
+
+			$css = $registry->get_css();
+
+			// Skip if no CSS to enqueue
+			if ( empty( $css ) ) {
+				continue;
+			}
+
+			// Register the style if needed
+			if ( ! wp_style_is( $handle, 'registered' ) ) {
+				wp_register_style( $handle, false, [], PULSAR_EXTENSIONS_VERSION );
+			}
+
+			wp_enqueue_style( $handle );
+			wp_add_inline_style( $handle, $css );
+
+			$enqueued[ $handle ] = true;
 		}
-
-		$css = StickyOffsetRegistry::instance()->get_sticky_offset_css();
-
-		if ( empty( $css ) ) {
-			return;
-		}
-
-		$handle = 'pulsar-extensions-sticky-offset-utilities';
-
-		if ( ! wp_style_is( $handle, 'registered' ) ) {
-			wp_register_style( $handle, false, [], PULSAR_EXTENSIONS_VERSION );
-		}
-
-		wp_enqueue_style( $handle );
-		wp_add_inline_style( $handle, $css );
-
-		$enqueued = true;
 	}
 
 	/**

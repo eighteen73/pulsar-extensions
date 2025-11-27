@@ -18,7 +18,7 @@ use Eighteen73\PulsarExtensions\StyleEngine\StylesheetGenerator;
 /**
  * Manages sticky offset utility classes.
  */
-class StickyOffsetRegistry {
+class StickyOffsetRegistry implements StylesheetRegistryInterface {
 
 	use Singleton;
 
@@ -138,7 +138,7 @@ class StickyOffsetRegistry {
 				[
 					'top' => "calc(var(--wp--preset--spacing--{$slug}) + var(--wp-admin--admin-bar--position-offset, 0px))",
 				],
-				true
+				false
 			);
 
 			$generator->add_rule( $rule );
@@ -150,12 +150,34 @@ class StickyOffsetRegistry {
 			[
 				'top' => 'calc(0px + var(--wp-admin--admin-bar--position-offset, 0px))',
 			],
-			true
+			false
 		);
 
 		$generator->add_rule( $rule );
 
 		return $generator->get_stylesheet();
+	}
+
+	/**
+	 * Get the generated CSS stylesheet.
+	 *
+	 * Implements StylesheetRegistryInterface.
+	 *
+	 * @return string The generated CSS.
+	 */
+	public function get_css(): string {
+		return $this->get_sticky_offset_css();
+	}
+
+	/**
+	 * Get the stylesheet handle for wp_enqueue_style().
+	 *
+	 * Implements StylesheetRegistryInterface.
+	 *
+	 * @return string The stylesheet handle.
+	 */
+	public function get_handle(): string {
+		return 'pulsar-extensions-sticky-offset-utilities';
 	}
 
 	/**
