@@ -13,15 +13,16 @@ import {
 import { __ } from '@wordpress/i18n';
 
 /**
- * Internal dependencies
- */
-import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
-
-/**
  * External dependencies
  */
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 import clsx from 'clsx';
+
+/**
+ * Internal dependencies
+ */
+import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
+import './style.scss';
 
 /**
  * additional block attributes object

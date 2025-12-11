@@ -1,0 +1,13 @@
+@use "sass:list";
+@use "sass:map";
+@use "../../constants/_breakpoints" as *;
+
+.is-position-sticky.is-unstuck-on-mobile {
+	@each $breakpoint-name, $breakpoint-size in $breakpoints {
+		@media (--#{$breakpoint-name}-down) {
+			&:where(.is-unstuck-on-#{$breakpoint-name}) {
+				position: static;
+			}
+		}
+	}
+}
