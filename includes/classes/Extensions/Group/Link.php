@@ -136,7 +136,8 @@ class Link {
 	}
 
 	/**
-	 * Inject the anchor immediately after the first opening tag in the block markup.
+	 * Inject the anchor right before the closing tag in the block markup.
+	 * This is to ensure the injected link doesn't affect the block's spacing
 	 *
 	 * @param string $block_content The existing block markup.
 	 * @param string $link_markup The link markup to insert.
@@ -144,12 +145,15 @@ class Link {
 	 * @return string
 	 */
 	private function inject_link_markup( string $block_content, string $link_markup ): string {
-		$insertion_point = strpos( $block_content, '>' );
+
+		// Find the last closing tag in the block content
+		$insertion_point = strrpos( $block_content, '</' );
 
 		if ( false === $insertion_point ) {
 			return $block_content;
 		}
 
-		return substr_replace( $block_content, $link_markup, $insertion_point + 1, 0 );
+		// Inject the link markup right before the last closing tag
+		return substr_replace( $block_content, $link_markup, $insertion_point, 0 );
 	}
 }
