@@ -1,0 +1,39 @@
+@use "../../constants/_breakpoints" as *;
+
+.wp-block-columns {
+
+	// Columns should always be rows unless set to stack.
+	&:where(:not([class^="is-stacked-on"])) {
+		flex-direction: column;
+	}
+
+	&:where(.is-reversed-when-stacked) {
+		flex-direction: column-reverse;
+	}
+
+	/// The fallback stacking class.
+	&:where(.is-stacked-on-sm),
+	&:where(:not([class*="is-stacked-on"])) {
+		@media (--sm) {
+			flex-direction: row;
+		}
+	}
+
+	&:where(.is-stacked-on-md) {
+		@media (--md) {
+			flex-direction: row;
+		}
+	}
+
+	&:where(.is-stacked-on-lg) {
+		@media (--lg) {
+			flex-direction: row;
+		}
+	}
+
+	&:where(.is-stacked-on-xl) {
+		@media (--xl) {
+			flex-direction: row;
+		}
+	}
+}

@@ -15,6 +15,7 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
+import './style.scss';
 
 /**
  * additional block attributes object
