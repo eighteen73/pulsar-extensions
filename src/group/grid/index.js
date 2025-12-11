@@ -6,18 +6,19 @@ import { Button, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Internal dependencies
- */
-import breakpoints from '../../constants/breakpoints';
-import GridColumnsControl from '../../components/grid-columns-control';
-import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
-
-/**
  * External dependencies
  */
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 import { Repeater } from '@10up/block-components/components/repeater';
 import clsx from 'clsx';
+
+/**
+ * Internal dependencies
+ */
+import breakpoints from '../../constants/breakpoints';
+import GridColumnsControl from '../../components/grid-columns-control';
+import BreakpointSelectionControl from '../../components/breakpoint-selection-control';
+import './style.scss';
 
 /**
  * additional block attributes object
@@ -185,9 +186,8 @@ function generateClassNames(attributes) {
 
 		responsiveColumns.forEach((item) => {
 			if (item?.breakpoint && item?.columnCount) {
-				classObject[
-					`grid-columns-${item.breakpoint}-${item.columnCount}`
-				] = true;
+				classObject[`is-responsive-columns-on-${item.breakpoint}`] =
+					true;
 			}
 		});
 
@@ -195,10 +195,35 @@ function generateClassNames(attributes) {
 	}
 }
 
+/**
+ * generateInlineStyles
+ *
+ * a function to generate the new inline styles object that should get added to
+ * the wrapping element of the block.
+ *
+ * @param {object} attributes block attributes
+ * @returns {string}
+ */
+function generateInlineStyles(attributes) {
+	const { responsiveColumns = [] } = attributes;
+
+	const styles = {};
+
+	responsiveColumns.forEach((item) => {
+		if (item?.breakpoint && item?.columnCount) {
+			styles[`--grid-template-columns-${item.breakpoint}`] =
+				`repeat(${item.columnCount}, 1fr)`;
+		}
+	});
+
+	return styles;
+}
+
 registerBlockExtension('core/group', {
 	extensionName: 'pulsar-extensions/group/grid',
 	attributes: additionalAttributes,
 	classNameGenerator: generateClassNames,
+	inlineStyleGenerator: generateInlineStyles,
 	Edit: BlockEdit,
 	order: 'after',
 });
