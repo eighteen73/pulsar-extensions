@@ -4,16 +4,16 @@
 import { BlockControls } from '@wordpress/block-editor';
 
 /**
- * Internal dependencies
- */
-import LinkControl from '../../components/link-control';
-// import './style.scss';
-
-/**
  * External dependencies
  */
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 import clsx from 'clsx';
+
+/**
+ * Internal dependencies
+ */
+import LinkControl from '../../components/link-control';
+import './style.scss';
 
 /**
  * additional block attributes object
