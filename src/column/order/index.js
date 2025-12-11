@@ -20,6 +20,7 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import FlexOrderControl from '../../components/flex-order-control';
+import './style.scss';
 
 /**
  * additional block attributes object
