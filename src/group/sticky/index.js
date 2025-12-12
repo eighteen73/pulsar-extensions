@@ -28,14 +28,16 @@ import './style.scss';
  * additional block attributes object
  */
 const additionalAttributes = {
+	stickyPosition: {
+		type: 'string',
+		default: 'top',
+	},
 	stickyOffset: {
 		type: 'string',
+		default: '0',
 	},
 	stickyZIndex: {
 		type: 'number',
-	},
-	stickyOnScrollUp: {
-		type: 'boolean',
 	},
 	unstickOnMobile: {
 		type: 'boolean',
@@ -43,6 +45,35 @@ const additionalAttributes = {
 	unstickBreakpoint: {
 		type: 'string',
 	},
+};
+
+const stickyPositionOptions = [
+	{
+		key: 'top',
+		name: __('Top', 'pulsar-extensions'),
+	},
+	{
+		key: 'bottom',
+		name: __('Bottom', 'pulsar-extensions'),
+	},
+];
+
+/**
+ * Derive the sticky offset CSS value for the custom property.
+ *
+ * @param {string | null | undefined} stickyOffset Selected offset slug.
+ * @returns {string | null}
+ */
+const getStickyOffsetValue = (stickyOffset) => {
+	if (!stickyOffset && stickyOffset !== '0') {
+		return null;
+	}
+
+	if (stickyOffset === '0') {
+		return '0px';
+	}
+
+	return `var(--wp--preset--spacing--${stickyOffset})`;
 };
 
 /**
@@ -54,9 +85,9 @@ const additionalAttributes = {
 function BlockEdit(props) {
 	const { attributes, setAttributes } = props;
 	const {
+		stickyPosition,
 		stickyOffset,
 		stickyZIndex,
-		stickyOnScrollUp,
 		unstickOnMobile,
 		unstickBreakpoint,
 	} = attributes;
@@ -83,9 +114,23 @@ function BlockEdit(props) {
 					<div style={{ paddingTop: '16px' }}>
 						<VStack spacing={4}>
 							<CustomSelectControl
-								label={__('Top offset', 'pulsar-extensions')}
+								label={__('Position', 'pulsar-extensions')}
+								value={stickyPositionOptions.find(
+									(option) =>
+										option.key === (stickyPosition || 'top')
+								)}
+								onChange={({ selectedItem }) => {
+									setAttributes({
+										stickyPosition:
+											selectedItem?.key || 'top',
+									});
+								}}
+								options={stickyPositionOptions}
+							/>
+							<CustomSelectControl
+								label={__('Sticky offset', 'pulsar-extensions')}
 								help={__(
-									'Distance from the top edge when stuck to the viewport',
+									'Distance from the viewport edge when the block is stuck.',
 									'pulsar-extensions'
 								)}
 								value={spacingOptions.find(
@@ -121,22 +166,6 @@ function BlockEdit(props) {
 									});
 								}}
 								step={1}
-							/>
-							<ToggleControl
-								label={__(
-									'Hide on scroll down',
-									'pulsar-extensions'
-								)}
-								help={__(
-									'Hide sticky element when scrolling down, show when scrolling up.',
-									'pulsar-extensions'
-								)}
-								checked={stickyOnScrollUp || false}
-								onChange={(value) =>
-									setAttributes({
-										stickyOnScrollUp: value,
-									})
-								}
 							/>
 							<ToggleControl
 								label={__(
@@ -192,7 +221,7 @@ function BlockEdit(props) {
  */
 function generateClassNames(attributes) {
 	const {
-		stickyOnScrollUp,
+		stickyPosition,
 		stickyOffset,
 		unstickOnMobile,
 		unstickBreakpoint,
@@ -202,7 +231,7 @@ function generateClassNames(attributes) {
 	const isSticky = style?.position?.type === 'sticky';
 
 	return clsx({
-		['is-sticky-hidden-on-scroll-down']: stickyOnScrollUp && isSticky,
+		[`is-position-sticky-${stickyPosition}`]: stickyPosition && isSticky,
 		[`is-sticky-offset-${stickyOffset}`]: stickyOffset && isSticky,
 		['is-unstuck-on-mobile']: unstickOnMobile && isSticky,
 		[`is-unstuck-on-${unstickBreakpoint}`]:
@@ -220,10 +249,23 @@ function generateClassNames(attributes) {
  * @returns {string}
  */
 function generateInlineStyles(attributes) {
-	const { stickyZIndex } = attributes;
-	return {
-		zIndex: stickyZIndex,
-	};
+	const { stickyZIndex, stickyOffset, style } = attributes;
+	const inlineStyles = {};
+	const isSticky = style?.position?.type === 'sticky';
+
+	if (typeof stickyZIndex === 'number') {
+		inlineStyles.zIndex = stickyZIndex;
+	}
+
+	if (isSticky) {
+		const stickyOffsetValue = getStickyOffsetValue(stickyOffset);
+
+		if (stickyOffsetValue !== null) {
+			inlineStyles['--sticky-offset'] = stickyOffsetValue;
+		}
+	}
+
+	return inlineStyles;
 }
 
 registerBlockExtension('core/group', {

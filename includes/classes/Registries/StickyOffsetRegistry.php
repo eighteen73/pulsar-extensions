@@ -7,8 +7,6 @@
  * @package Eighteen73\PulsarExtensions
  */
 
-declare(strict_types=1);
-
 namespace Eighteen73\PulsarExtensions\Registries;
 
 use Eighteen73\PulsarExtensions\Plugin;
@@ -57,7 +55,7 @@ class StickyOffsetRegistry implements StylesheetRegistryInterface {
 			return '';
 		}
 
-		$css = $this->generate_sticky_offset_classes( $spacing_scale );
+		$css = $this->generate_offset_variable_classes( $spacing_scale );
 
 		if ( ! $is_development ) {
 			set_transient( self::CACHE_KEY, $css, self::CACHE_EXPIRATION );
@@ -113,17 +111,27 @@ class StickyOffsetRegistry implements StylesheetRegistryInterface {
 	}
 
 	/**
-	 * Generate sticky offset utility classes.
+	 * Generate sticky offset utility classes that expose a CSS custom property.
 	 *
 	 * Generates classes like:
-	 * .has-sticky-offset-small { top: calc(var(--wp--preset--spacing--small) + var(--wp-admin--admin-bar--position-offset, 0px)) !important; }
+	 * .is-stickyoffset-sm { --sticky-offset: var(--wp--preset--spacing--sm); }
 	 *
 	 * @param array<int, array<string, string>> $spacing_scale Spacing preset definitions.
 	 *
 	 * @return string
 	 */
-	private function generate_sticky_offset_classes( array $spacing_scale ): string {
+	private function generate_offset_variable_classes( array $spacing_scale ): string {
 		$generator = new StylesheetGenerator();
+
+		$generator->add_rule(
+			$generator->generate_utility_class(
+				'.is-sticky-offset-0',
+				[
+					'--sticky-offset' => '0px',
+				],
+				true
+			)
+		);
 
 		foreach ( $spacing_scale as $spacing ) {
 			$slug = $spacing['slug'] ?? '';
@@ -132,11 +140,11 @@ class StickyOffsetRegistry implements StylesheetRegistryInterface {
 				continue;
 			}
 
-			// Generate the top offset class
+			$slug = sanitize_html_class( $slug );
 			$rule = $generator->generate_utility_class(
 				".is-sticky-offset-{$slug}",
 				[
-					'top' => "calc(var(--wp--preset--spacing--{$slug}) + var(--wp-admin--admin-bar--position-offset, 0px))",
+					'--sticky-offset' => "var(--wp--preset--spacing--{$slug})",
 				],
 				true
 			);
