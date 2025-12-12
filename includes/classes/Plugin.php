@@ -44,6 +44,7 @@ class Plugin {
 		add_action( 'init', [ $this, 'load_textdomain' ] );
 		add_action( 'init', [ $this, 'register_block_styles' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_registry_stylesheets' ] );
+		add_action( 'enqueue_block_assets', [ $this, 'enqueue_view_scripts' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_global_editor_scripts' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_scripts' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_editor_styles' ] );
@@ -129,7 +130,13 @@ class Plugin {
 			}
 
 			foreach ( $asset_files as $asset_file ) {
-				$extension_name              = basename( $asset_file, '.asset.php' );
+				$extension_name = basename( $asset_file, '.asset.php' );
+
+				// Skip view scripts (handled separately).
+				if ( substr( $extension_name, -5 ) === '-view' ) {
+					continue;
+				}
+
 				$extensions[ $block_name ][] = $extension_name;
 			}
 		}
@@ -371,6 +378,44 @@ class Plugin {
 				if ( file_exists( $style_rtl_path ) ) {
 					wp_style_add_data( $style_handle, 'rtl', 'replace' );
 				}
+			}
+		}
+	}
+
+	/**
+	 * Enqueue front-end view scripts for extensions.
+	 *
+	 * Automatically loads any built `*-view.js` files for enabled extensions.
+	 *
+	 * @return void
+	 */
+	public function enqueue_view_scripts(): void {
+
+		// Only run on the front end.
+		if ( is_admin() ) {
+			return;
+		}
+
+		$enabled_extensions = $this->get_enabled_extensions();
+
+		foreach ( $enabled_extensions as $block => $extensions ) {
+			foreach ( $extensions as $extension ) {
+				$asset_path  = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}-view.asset.php";
+				$script_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}-view.js";
+
+				if ( ! file_exists( $asset_path ) || ! file_exists( $script_path ) ) {
+					continue;
+				}
+
+				$asset = require $asset_path;
+
+				wp_enqueue_script(
+					"pulsar-extensions-{$block}-{$extension}-view",
+					PULSAR_EXTENSIONS_URL . "build/{$block}/{$extension}-view.js",
+					$asset['dependencies'] ?? [],
+					$asset['version'],
+					true
+				);
 			}
 		}
 	}
