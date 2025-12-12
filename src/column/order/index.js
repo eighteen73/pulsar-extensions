@@ -39,29 +39,40 @@ const additionalAttributes = {
  */
 function BlockEdit({ clientId, attributes, setAttributes }) {
 	const { orderWhenStacked } = attributes;
-	const columnCount = useSelect(
-		(select) => {
-			if (!clientId) {
-				return 1;
-			}
 
+	const { isStackedOnMobile, columnCount } = useSelect(
+		(select) => {
 			const { getBlockParentsByBlockName, getBlock } =
 				select(blockEditorStore);
+
+			if (!clientId) {
+				return { isStackedOnMobile: true, columnCount: 1 };
+			}
+
 			const parentColumns = getBlockParentsByBlockName(clientId, [
 				'core/columns',
 			]);
+
 			const parentColumnsClientId = parentColumns?.[0];
 
 			if (!parentColumnsClientId) {
-				return 1;
+				return { isStackedOnMobile: true, columnCount: 1 };
 			}
 
 			const parentColumnsBlock = getBlock(parentColumnsClientId);
 
-			return parentColumnsBlock?.innerBlocks?.length || 1;
+			return {
+				isStackedOnMobile:
+					parentColumnsBlock?.attributes?.isStackedOnMobile ?? true,
+				columnCount: parentColumnsBlock?.innerBlocks?.length || 1,
+			};
 		},
 		[clientId]
 	);
+
+	if (!isStackedOnMobile) {
+		return null;
+	}
 
 	useEffect(() => {
 		if (
