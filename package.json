@@ -31,6 +31,7 @@
 		"@wordpress/browserslist-config": "latest",
 		"@wordpress/prettier-config": "latest",
 		"@wordpress/scripts": "latest",
+		"fast-glob": "^3.3.3",
 		"lefthook": "latest",
 		"postcss-preset-env": "latest"
 	},
