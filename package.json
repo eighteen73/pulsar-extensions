@@ -37,6 +37,7 @@
 	},
 	"dependencies": {
 		"@10up/block-components": "^1.21.4",
+		"@wordpress/icons": "^11.3.0",
 		"clsx": "^2.1.1"
 	}
 }

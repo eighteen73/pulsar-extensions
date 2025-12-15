@@ -32,8 +32,8 @@ const additionalAttributes = {
 /**
  * BlockEdit
  *
- * @param {object} props block props
- * @returns {JSX}
+ * @param {Object} props block props
+ * @return {JSX.Element} inspector controls for configuring row stacking
  */
 function BlockEdit(props) {
 	const { attributes, setAttributes } = props;
@@ -101,8 +101,8 @@ function BlockEdit(props) {
 /**
  * generateClassNames
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes block attributes
+ * @return {string} generated class names
  */
 function generateClassNames(attributes) {
 	const { isStackedOnMobile, stackedBreakpoint, layout } = attributes;

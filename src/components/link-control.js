@@ -4,6 +4,7 @@ import {
 	MenuItem,
 	Button,
 	ToggleControl,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalVStack as VStack,
 	NavigableMenu,
 	TextControl,
@@ -33,14 +34,14 @@ const NEW_TAB_REL = ['noreferrer', 'noopener'];
  *
  * A reusable component for managing link controls in the block toolbar
  *
- * @param {object} props Component props
- * @param {string} props.url The current url value
- * @param {string} props.linkDestination The current link destination
- * @param {string} props.linkTarget The current link target
- * @param {string} props.rel The current rel attribute
- * @param {string} props.linkClass The current link class
- * @param {Function} props.setAttributes Function to update block attributes
- * @returns {JSX.Element} The link control component
+ * @param {Object}   props                 Component props
+ * @param {string}   props.url             The current url value
+ * @param {string}   props.linkDestination The current link destination
+ * @param {string}   props.linkTarget      The current link target
+ * @param {string}   props.rel             The current rel attribute
+ * @param {string}   props.linkClass       The current link class
+ * @param {Function} props.setAttributes   Function to update block attributes
+ * @return {JSX.Element} The link control component
  */
 export default function GroupLinkControl({
 	url,
@@ -108,24 +109,6 @@ export default function GroupLinkControl({
 				icon: page,
 			},
 		];
-	};
-
-	const onSetUrl = (value) => {
-		const linkDestinations = getLinkDestinations();
-		let linkDestinationInput;
-		if (!value) {
-			linkDestinationInput = LINK_DESTINATION_NONE;
-		} else {
-			linkDestinationInput = (
-				linkDestinations.find((destination) => {
-					return destination.url === value;
-				}) || { linkDestination: LINK_DESTINATION_CUSTOM }
-			).linkDestination;
-		}
-		setAttributes({
-			linkDestination: linkDestinationInput,
-			url: value,
-		});
 	};
 
 	const getUpdatedLinkTargetSettings = (value) => {
@@ -280,17 +263,16 @@ export default function GroupLinkControl({
 					/>
 				</>
 			);
-		} else {
-			return (
-				<URLPopover.LinkEditor
-					className="block-editor-format-toolbar__link-container-content"
-					value={linkEditorValue}
-					onChangeInputValue={setUrlInput}
-					onSubmit={onSubmitLinkChange()}
-					autocompleteRef={autocompleteRef}
-				/>
-			);
 		}
+		return (
+			<URLPopover.LinkEditor
+				className="block-editor-format-toolbar__link-container-content"
+				value={linkEditorValue}
+				onChangeInputValue={setUrlInput}
+				onSubmit={onSubmitLinkChange()}
+				autocompleteRef={autocompleteRef}
+			/>
+		);
 	};
 
 	return (
@@ -315,22 +297,22 @@ export default function GroupLinkControl({
 					additionalControls={
 						showLinkEditor && (
 							<NavigableMenu>
-								{getLinkDestinations().map((link) => (
+								{getLinkDestinations().map((destination) => (
 									<MenuItem
-										key={link.linkDestination}
-										icon={link.icon}
+										key={destination.linkDestination}
+										icon={destination.icon}
 										iconPosition="left"
 										onClick={() => {
 											setUrlInput(null);
 											onChangeUrl({
 												url: undefined,
 												linkDestination:
-													link.linkDestination,
+													destination.linkDestination,
 											});
 											stopEditLink();
 										}}
 									>
-										{link.title}
+										{destination.title}
 									</MenuItem>
 								))}
 							</NavigableMenu>

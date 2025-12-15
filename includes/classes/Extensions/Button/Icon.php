@@ -23,6 +23,5 @@ class Icon {
 	 * @return void
 	 */
 	public function setup(): void {
-
 	}
 }

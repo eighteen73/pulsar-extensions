@@ -34,8 +34,11 @@ const additionalAttributes = {
 /**
  * BlockEdit
  *
- * @param {object} props block props
- * @returns {JSX}
+ * @param {Object}   props               Component props.
+ * @param {string}   props.clientId      Current block client ID.
+ * @param {Object}   props.attributes    Current block attributes.
+ * @param {Function} props.setAttributes Attribute setter provided by Gutenberg.
+ * @return {JSX.Element|null} Rendered inspector controls or null when not stacked.
  */
 function BlockEdit({ clientId, attributes, setAttributes }) {
 	const { orderWhenStacked } = attributes;
@@ -70,11 +73,11 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 		[clientId]
 	);
 
-	if (!isStackedOnMobile) {
-		return null;
-	}
-
 	useEffect(() => {
+		if (!isStackedOnMobile) {
+			return;
+		}
+
 		if (
 			typeof orderWhenStacked === 'number' &&
 			orderWhenStacked > columnCount &&
@@ -82,7 +85,11 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 		) {
 			setAttributes({ orderWhenStacked: columnCount });
 		}
-	}, [columnCount, orderWhenStacked, setAttributes]);
+	}, [columnCount, isStackedOnMobile, orderWhenStacked, setAttributes]);
+
+	if (!isStackedOnMobile) {
+		return null;
+	}
 
 	return (
 		<InspectorControls group="settings">
@@ -107,8 +114,8 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 /**
  * generateClassNames
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes block attributes
+ * @return {string} Generated class names for the column block.
  */
 function generateClassNames(attributes) {
 	const { orderWhenStacked } = attributes;

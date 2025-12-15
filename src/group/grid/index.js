@@ -33,8 +33,10 @@ const additionalAttributes = {
 /**
  * BlockEdit
  *
- * @param {object} props block props
- * @returns {JSX}
+ * @param {Object}   props               Component props.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Attribute setter provided by Gutenberg.
+ * @return {JSX.Element|null} Inspector controls for managing responsive grids or null.
  */
 function BlockEdit(props) {
 	const { attributes, setAttributes } = props;
@@ -171,8 +173,8 @@ function BlockEdit(props) {
 /**
  * generateClassNames
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {string} Generated class list representing responsive column states.
  */
 function generateClassNames(attributes) {
 	const { layout, responsiveColumns = [] } = attributes;
@@ -180,19 +182,20 @@ function generateClassNames(attributes) {
 	const isGridLayout = layout?.type === 'grid';
 	const isManualMode = layout?.minimumColumnWidth === null;
 
-	if (isGridLayout && isManualMode) {
-		// Build an object of classes from the responsiveColumns array
-		const classObject = {};
-
-		responsiveColumns.forEach((item) => {
-			if (item?.breakpoint && item?.columnCount) {
-				classObject[`is-responsive-columns-on-${item.breakpoint}`] =
-					true;
-			}
-		});
-
-		return clsx(classObject);
+	if (!(isGridLayout && isManualMode)) {
+		return '';
 	}
+
+	// Build an object of classes from the responsiveColumns array
+	const classObject = {};
+
+	responsiveColumns.forEach((item) => {
+		if (item?.breakpoint && item?.columnCount) {
+			classObject[`is-responsive-columns-on-${item.breakpoint}`] = true;
+		}
+	});
+
+	return clsx(classObject);
 }
 
 /**
@@ -201,8 +204,8 @@ function generateClassNames(attributes) {
  * a function to generate the new inline styles object that should get added to
  * the wrapping element of the block.
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {Object<string, string>} Inline CSS variables representing responsive grid templates.
  */
 function generateInlineStyles(attributes) {
 	const { responsiveColumns = [] } = attributes;

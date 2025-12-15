@@ -7,6 +7,7 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 
@@ -16,13 +17,13 @@ import {
  * A reusable control for setting the number of grid columns.
  * Provides both a number input and a range slider for better UX.
  *
- * @param {Object} props Component props
- * @param {number} props.value Current column count value
+ * @param {Object}   props          Component props
+ * @param {number}   props.value    Current column count value
  * @param {Function} props.onChange Callback function when value changes
- * @param {string} props.label Label for the control (optional, defaults to "Columns")
- * @param {number} props.min Minimum column count (optional, defaults to 1)
- * @param {number} props.max Maximum column count (optional, defaults to 16)
- * @returns {JSX.Element} The column control component
+ * @param {string}   props.label    Label for the control (optional, defaults to "Columns")
+ * @param {number}   props.min      Minimum column count (optional, defaults to 1)
+ * @param {number}   props.max      Maximum column count (optional, defaults to 16)
+ * @return {JSX.Element} The column control component
  */
 export default function GridColumnsControl({
 	value = 3,
