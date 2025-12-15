@@ -39,8 +39,10 @@ const additionalAttributes = {
 /**
  * BlockEdit
  *
- * @param {object} props block props
- * @returns {JSX}
+ * @param {Object}   props               Component props.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Attribute setter provided by Gutenberg.
+ * @return {JSX.Element} Toolbar controls that configure block-level links.
  */
 function BlockEdit(props) {
 	const { attributes, setAttributes } = props;
@@ -63,15 +65,15 @@ function BlockEdit(props) {
 /**
  * generateClassNames
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {string} Generated class list for link state styling.
  */
 function generateClassNames(attributes) {
 	const { url, linkDestination, linkClass } = attributes;
 
 	return clsx({
-		['is-linked']: !!url || linkDestination === 'post',
-		['is-linked-to-post']: linkDestination === 'post',
+		'is-linked': !!url || linkDestination === 'post',
+		'is-linked-to-post': linkDestination === 'post',
 		[linkClass]: !!linkClass,
 	});
 }

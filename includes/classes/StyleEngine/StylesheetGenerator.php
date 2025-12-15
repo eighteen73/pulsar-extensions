@@ -79,7 +79,7 @@ class StylesheetGenerator {
 	 * @param array<int, array<string, mixed>> $presets Array of preset definitions.
 	 * @param string                           $class_pattern Class pattern with $slug placeholder.
 	 * @param string                           $property_name CSS property name.
-	 * @param string                           $value_callback Callable to generate value from preset.
+	 * @param callable                         $value_callback Callable to generate value from preset.
 	 * @param bool                             $important Whether to add !important. Default true.
 	 *
 	 * @return CSSRule[]

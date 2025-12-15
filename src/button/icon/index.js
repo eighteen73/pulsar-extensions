@@ -4,7 +4,9 @@
 import { InspectorControls } from '@wordpress/block-editor';
 import {
 	PanelBody,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalToggleGroupControl as ToggleGroupControl,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -44,8 +46,11 @@ const additionalAttributes = {
 /**
  * BlockEdit
  *
- * @param {object} props block props
- * @returns {JSX}
+ * @param {Object}   props               Component props.
+ * @param {string}   props.clientId      Block client identifier.
+ * @param {Object}   props.attributes    Current block attributes.
+ * @param {Function} props.setAttributes Setter for block attributes.
+ * @return {JSX.Element} Inspector controls for selecting and configuring icons.
  */
 function BlockEdit({ clientId, attributes, setAttributes }) {
 	const { icon } = attributes;
@@ -55,7 +60,7 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 	/**
 	 * Helper to update icon attributes while preserving existing values
 	 *
-	 * @param {object} newAttributes New attributes to merge into the icon object
+	 * @param {Object} newAttributes New attributes to merge into the icon object
 	 */
 	const updateIcon = (newAttributes) => {
 		const updatedIcon = { ...icon, ...newAttributes };
@@ -116,8 +121,8 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 /**
  * generateClassNames
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {string} Generated class names describing the icon configuration.
  */
 function generateClassNames(attributes) {
 	const { icon } = attributes;
@@ -143,8 +148,8 @@ function generateClassNames(attributes) {
  * a function to generate the new inline styles object that should get added to
  * the wrapping element of the block.
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {Object<string, string>|null} Inline CSS variables for icon styling or null.
  */
 function generateInlineStyles(attributes) {
 	const { icon } = attributes;

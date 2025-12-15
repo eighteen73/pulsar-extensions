@@ -7,7 +7,6 @@
 
 import { registerIcons } from '@10up/block-components/api/register-icons';
 import apiFetch from '@wordpress/api-fetch';
-import { subscribe } from '@wordpress/data';
 
 let iconsInitialized = false;
 

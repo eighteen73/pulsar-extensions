@@ -62,7 +62,7 @@ const stickyPositionOptions = [
  * Derive the sticky offset CSS value for the custom property.
  *
  * @param {string | null | undefined} stickyOffset Selected offset slug.
- * @returns {string | null}
+ * @return {string | null} Sticky offset CSS value.
  */
 const getStickyOffsetValue = (stickyOffset) => {
 	if (!stickyOffset && stickyOffset !== '0') {
@@ -79,8 +79,10 @@ const getStickyOffsetValue = (stickyOffset) => {
 /**
  * BlockEdit
  *
- * @param {object} props block props
- * @returns {JSX}
+ * @param {Object}   props               Component props.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Attribute setter provided by Gutenberg.
+ * @return {JSX.Element|null} Inspector controls for sticky behavior or null if not sticky.
  */
 function BlockEdit(props) {
 	const { attributes, setAttributes } = props;
@@ -216,8 +218,8 @@ function BlockEdit(props) {
 /**
  * generateClassNames
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {string} Generated class list describing sticky state variations.
  */
 function generateClassNames(attributes) {
 	const {
@@ -233,7 +235,7 @@ function generateClassNames(attributes) {
 	return clsx({
 		[`is-position-sticky-${stickyPosition}`]: stickyPosition && isSticky,
 		[`is-sticky-offset-${stickyOffset}`]: stickyOffset && isSticky,
-		['is-unstuck-on-mobile']: unstickOnMobile && isSticky,
+		'is-unstuck-on-mobile': unstickOnMobile && isSticky,
 		[`is-unstuck-on-${unstickBreakpoint}`]:
 			unstickOnMobile && !!unstickBreakpoint && isSticky,
 	});
@@ -245,8 +247,8 @@ function generateClassNames(attributes) {
  * a function to generate the new inline styles object that should get added to
  * the wrapping element of the block.
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {Object<string, string|number>} Inline styles required for sticky positioning.
  */
 function generateInlineStyles(attributes) {
 	const { stickyZIndex, stickyOffset, style } = attributes;

@@ -32,8 +32,10 @@ const additionalAttributes = {
 /**
  * BlockEdit
  *
- * @param {object} props block props
- * @returns {JSX}
+ * @param {Object}   props               Component props.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Attribute setter provided by Gutenberg.
+ * @return {JSX.Element} Inspector controls for configuring stacked column layout.
  */
 function BlockEdit({ attributes, setAttributes }) {
 	const { isReversedOnMobile, isStackedOnMobile, stackedBreakpoint } =
@@ -73,8 +75,8 @@ function BlockEdit({ attributes, setAttributes }) {
 /**
  * generateClassNames
  *
- * @param {object} attributes block attributes
- * @returns {string}
+ * @param {Object} attributes Block attributes.
+ * @return {string} Generated class list to describe stacked column behavior.
  */
 function generateClassNames(attributes) {
 	const { isStackedOnMobile, isReversedOnMobile, stackedBreakpoint } =
