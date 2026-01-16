@@ -1,4 +1,5 @@
 # Pulsar Extensions
+Extensions for the Pulsar theme.
 
 ## License
 
