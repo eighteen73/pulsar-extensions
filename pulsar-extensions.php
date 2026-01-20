@@ -4,7 +4,7 @@
  * Plugin URI:        https://github.com/brettsmason/pulsar-extensions/
  * Update URI:        https://eighteen73.co.uk
  * Description:       Extensions for the Pulsar theme.
- * Version:           0.1.1
+ * Version:           0.1.2
  * Requires at least: 6.8
  * Requires PHP:      7.4
  * Requires Plugins:
