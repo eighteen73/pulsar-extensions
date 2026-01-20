@@ -17,5 +17,6 @@ jobs:
       node_version: 22
       source_branch: main
       release_branch: release
+      run_composer_install: true
       built_asset_paths: build
       plugin_file: pulsar-extensions.php
