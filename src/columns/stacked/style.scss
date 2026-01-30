@@ -11,6 +11,10 @@
 		flex-direction: column-reverse;
 	}
 
+	.wp-block-columns:where(.is-not-stacked-on-mobile) {
+		flex-direction: row;
+	}
+
 	/// The fallback stacking class.
 	&:where(.is-stacked-on-sm),
 	&:where(:not([class*="is-stacked-on"])) {
