@@ -4,12 +4,12 @@
 		&::after {
 			background-color: currentcolor;
 			color: var(--icon-color, currentcolor);
-			height: 1em;
+			height: var(--icon-size, 1em);
 			mask-image: var(--icon);
 			mask-position: center;
 			mask-repeat: no-repeat;
 			mask-size: contain;
-			width: 1em;
+			width: var(--icon-size, 1em);
 		}
 	}
 
