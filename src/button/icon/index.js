@@ -32,8 +32,7 @@ import './style.scss';
  * 	icon: {
  * 		position: 'after',
  * 		color: 'blue',
- * 		name: 'star',
- * 		set: 'default',
+ * 		name: 'pulsar-extensions/arrow-right',
  * 	}
  * }
  */
@@ -55,7 +54,43 @@ const additionalAttributes = {
 function BlockEdit({ clientId, attributes, setAttributes }) {
 	const { icon } = attributes;
 	// Destructure icon properties with defaults
-	const { position = 'after', color, name, set } = icon || {};
+	const { position = 'after', color, name } = icon || {};
+
+	/**
+	 * Extract namespace and icon name from namespaced icon name.
+	 *
+	 * @param {string} namespacedName Namespaced icon name (e.g., 'pulsar-extensions/arrow-right').
+	 * @return {{namespace: string, iconName: string}|null} Extracted namespace and icon name.
+	 */
+	const parseIconName = (namespacedName) => {
+		if (!namespacedName || typeof namespacedName !== 'string') {
+			return null;
+		}
+
+		const parts = namespacedName.split('/');
+		if (parts.length !== 2) {
+			return null;
+		}
+
+		return {
+			namespace: parts[0],
+			iconName: parts[1],
+		};
+	};
+
+	/**
+	 * Build namespaced icon name from namespace and icon name.
+	 *
+	 * @param {string} namespace Icon namespace (e.g., 'pulsar-extensions').
+	 * @param {string} iconName  Icon name (e.g., 'arrow-right').
+	 * @return {string} Namespaced icon name.
+	 */
+	const buildIconName = (namespace, iconName) => {
+		if (!namespace || !iconName) {
+			return null;
+		}
+		return `${namespace}/${iconName}`;
+	};
 
 	/**
 	 * Helper to update icon attributes while preserving existing values
@@ -73,16 +108,26 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 		setAttributes({ icon: updatedIcon });
 	};
 
+	// Parse namespaced icon name for IconPicker
+	const iconParts = parseIconName(name);
+	const iconPickerValue = iconParts
+		? { name: iconParts.iconName, iconSet: iconParts.namespace }
+		: { name: null, iconSet: null };
+
 	return (
 		<>
 			<InspectorControls group="settings">
 				<PanelBody title={__('Icon', 'pulsar-extensions')}>
 					<IconPicker
 						className="pulsar-extensions-icon-picker"
-						value={{ name, iconSet: set }}
+						value={iconPickerValue}
 						onChange={(value) => {
-							const { iconSet, ...rest } = value;
-							updateIcon({ ...rest, set: iconSet });
+							const { iconSet, name: iconName } = value;
+							const namespacedName = buildIconName(
+								iconSet,
+								iconName
+							);
+							updateIcon({ name: namespacedName });
 						}}
 					/>
 
@@ -126,12 +171,20 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
  */
 function generateClassNames(attributes) {
 	const { icon } = attributes;
-	const { name, set, position, color } = icon || {};
+	const { name, position, color } = icon || {};
 
 	// Check if we actually have an icon selected
-	const hasIcon = Boolean(name && set);
+	const hasIcon = Boolean(name);
 	const isAfter = position === 'after';
-	const iconClass = hasIcon ? `has-icon-${set}-${name}` : null;
+
+	// Parse namespaced icon name to generate CSS class
+	// e.g., 'pulsar-extensions/arrow-right' -> 'has-icon-pulsar-extensions-arrow-right'
+	let iconClass = null;
+	if (hasIcon && typeof name === 'string') {
+		// Replace slashes with hyphens for CSS class name
+		const classSlug = name.replace(/\//g, '-');
+		iconClass = `has-icon-${classSlug}`;
+	}
 
 	return clsx({
 		'has-icon': hasIcon,
