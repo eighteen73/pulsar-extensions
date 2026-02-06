@@ -12,18 +12,25 @@ use Eighteen73\PulsarExtensions\Singleton;
 use Eighteen73\PulsarExtensions\StyleEngine\StylesheetGenerator;
 
 /**
- * Handles discovery and normalization of icon sets.
+ * Handles discovery and normalization of icons.
  */
 class IconRegistry implements StylesheetRegistryInterface {
 
 	use Singleton;
 
 	/**
-	 * Cache key for icon sets.
+	 * Icon namespace prefix.
 	 *
 	 * @var string
 	 */
-	private const CACHE_KEY = 'pulsar_extensions_icon_sets';
+	private const NAMESPACE = 'pulsar-extensions';
+
+	/**
+	 * Cache key for icons.
+	 *
+	 * @var string
+	 */
+	private const CACHE_KEY = 'pulsar_extensions_icons';
 
 	/**
 	 * Cache duration (24 hours).
@@ -33,13 +40,14 @@ class IconRegistry implements StylesheetRegistryInterface {
 	private const CACHE_EXPIRATION = DAY_IN_SECONDS;
 
 	/**
-	 * Get all available icon sets.
+	 * Get all available icons.
 	 *
-	 * Applies filters so themes/plugins can register additional sets.
+	 * Returns a flat array of icons with namespaced names.
+	 * Applies filters so themes/plugins can register additional icons.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
-	public function get_icon_sets(): array {
+	public function get_icons(): array {
 		$is_development = Plugin::is_development_mode();
 
 		if ( ! $is_development ) {
@@ -49,28 +57,28 @@ class IconRegistry implements StylesheetRegistryInterface {
 			}
 		}
 
-		$icon_sets = $this->load_plugin_icon_sets();
+		$icons = $this->load_plugin_icons();
 
 		/**
-		 * Filter the available icon sets.
+		 * Filter the available icons.
 		 *
 		 * Allows themes and plugins to add or modify icon definitions.
 		 *
-		 * @param array<int, array<string, mixed>> $icon_sets Icon sets.
+		 * @param array<int, array<string, mixed>> $icons Icons array.
 		 */
-		$icon_sets = apply_filters( 'pulsar_extensions_icon_sets', $icon_sets );
+		$icons = apply_filters( 'pulsar_extensions_icons', $icons );
 
-		$icon_sets = $this->normalize_icon_sets( $icon_sets );
+		$icons = $this->normalize_icons( $icons );
 
-		if ( empty( $icon_sets ) ) {
+		if ( empty( $icons ) ) {
 			return [];
 		}
 
 		if ( ! $is_development ) {
-			set_transient( self::CACHE_KEY, $icon_sets, self::CACHE_EXPIRATION );
+			set_transient( self::CACHE_KEY, $icons, self::CACHE_EXPIRATION );
 		}
 
-		return $icon_sets;
+		return $icons;
 	}
 
 	/**
@@ -79,13 +87,13 @@ class IconRegistry implements StylesheetRegistryInterface {
 	 * @return string
 	 */
 	public function get_icon_utility_css(): string {
-		$icon_sets = $this->get_icon_sets();
+		$icons = $this->get_icons();
 
-		if ( empty( $icon_sets ) ) {
+		if ( empty( $icons ) ) {
 			return '';
 		}
 
-		return $this->get_icon_variable_rules( $icon_sets );
+		return $this->get_icon_variable_rules( $icons );
 	}
 
 	/**
@@ -111,7 +119,7 @@ class IconRegistry implements StylesheetRegistryInterface {
 	}
 
 	/**
-	 * Clear the icon set cache.
+	 * Clear the icon cache.
 	 *
 	 * @return bool
 	 */
@@ -120,51 +128,107 @@ class IconRegistry implements StylesheetRegistryInterface {
 	}
 
 	/**
-	 * Load icon sets from the plugin's assets directory.
+	 * Register an icon for use in Pulsar Extensions.
+	 *
+	 * Helper function for themes and plugins to easily register icons.
+	 * Icons with the same name will overwrite previously registered icons.
+	 *
+	 * @param string $icon_name       Icon name including namespace (e.g., 'pulsar-extensions/arrow-right').
+	 * @param string $label           Human-readable label for the icon.
+	 * @param string $content_or_path SVG content as string, or file path to SVG file.
+	 * @param bool   $is_file_path    Whether $content_or_path is a file path (true) or SVG content (false).
+	 * @return bool True if icon was registered successfully.
+	 */
+	public static function register_icon( string $icon_name, string $label, string $content_or_path, bool $is_file_path = false ): bool {
+		// Ensure icon name has namespace separator
+		if ( ! str_contains( $icon_name, '/' ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				esc_html__( 'Icon name must include a namespace (e.g., "theme-name/icon-name").', 'pulsar-extensions' ),
+				'1.0.0'
+			);
+			return false;
+		}
+
+		$icon_data = [
+			'name'  => $icon_name,
+			'label' => $label,
+		];
+
+		if ( $is_file_path ) {
+			$icon_data['filePath'] = $content_or_path;
+		} else {
+			$icon_data['content'] = $content_or_path;
+		}
+
+		/**
+		 * Filter to add or modify icons.
+		 *
+		 * Themes and plugins can use this filter to register icons.
+		 * Icons with the same name will overwrite previous registrations.
+		 *
+		 * @param array<int, array<string, mixed>> $icons Existing icons array.
+		 * @return array<int, array<string, mixed>> Modified icons array.
+		 */
+		add_filter(
+			'pulsar_extensions_icons',
+			function ( array $icons ) use ( $icon_data ): array {
+				// Add the new icon (will overwrite if name matches)
+				$icons[] = $icon_data;
+				return $icons;
+			},
+			10
+		);
+
+		// Clear cache so new icon is available immediately
+		self::instance()->clear_cache();
+
+		return true;
+	}
+
+	/**
+	 * Load icons from the plugin's assets directory.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
-	private function load_plugin_icon_sets(): array {
+	private function load_plugin_icons(): array {
 		$icons_path = PULSAR_EXTENSIONS_PATH . 'assets/icons/';
 
 		if ( ! is_dir( $icons_path ) ) {
 			return [];
 		}
 
-		$icon_sets = [];
+		$icons = [];
 
 		$icon_set_dirs = glob( $icons_path . '*', GLOB_ONLYDIR );
 
 		if ( false === $icon_set_dirs ) {
-			return $icon_sets;
+			return $icons;
 		}
 
 		foreach ( $icon_set_dirs as $icon_set_dir ) {
 			$icon_set_name = basename( $icon_set_dir );
-			$icons         = $this->load_icons_from_directory( $icon_set_dir );
+			$set_icons     = $this->load_icons_from_directory( $icon_set_dir, $icon_set_name );
 
-			if ( empty( $icons ) ) {
+			if ( empty( $set_icons ) ) {
 				continue;
 			}
 
-			$icon_sets[] = [
-				'name'  => $icon_set_name,
-				'label' => $this->format_label( $icon_set_name ),
-				'icons' => $icons,
-			];
+			$icons = array_merge( $icons, $set_icons );
 		}
 
-		return $icon_sets;
+		return $icons;
 	}
 
 	/**
 	 * Load SVG icons from a directory.
 	 *
 	 * @param string $icon_set_path Directory path.
+	 * @param string $icon_set_name  Icon set name (directory name).
 	 *
 	 * @return array<int, array<string, string>>
 	 */
-	private function load_icons_from_directory( string $icon_set_path ): array {
+	private function load_icons_from_directory( string $icon_set_path, string $icon_set_name ): array {
 		$icons     = [];
 		$svg_files = glob( $icon_set_path . '/*.svg' );
 
@@ -173,17 +237,20 @@ class IconRegistry implements StylesheetRegistryInterface {
 		}
 
 		foreach ( $svg_files as $svg_file ) {
-			$icon_name  = basename( $svg_file, '.svg' );
-			$svg_source = $this->get_svg_source( $svg_file );
+			$icon_name   = basename( $svg_file, '.svg' );
+			$svg_content = $this->get_svg_source( $svg_file );
 
-			if ( empty( $svg_source ) ) {
+			if ( empty( $svg_content ) ) {
 				continue;
 			}
 
+			// Create namespaced icon name: pulsar-extensions/icon-name
+			$namespaced_name = self::NAMESPACE . '/' . $icon_name;
+
 			$icons[] = [
-				'name'   => $icon_name,
-				'label'  => $this->format_label( $icon_name ),
-				'source' => $svg_source,
+				'name'    => $namespaced_name,
+				'label'   => $this->format_label( $icon_name ),
+				'content' => $svg_content,
 			];
 		}
 
@@ -191,57 +258,16 @@ class IconRegistry implements StylesheetRegistryInterface {
 	}
 
 	/**
-	 * Normalize icon sets, ensuring consistent structure.
+	 * Normalize icons, ensuring consistent structure.
 	 *
-	 * @param array<int, array<string, mixed>> $icon_sets Icon set definitions.
+	 * Supports both 'content' and 'filePath' properties (like WordPress core).
+	 * Icons with the same name will overwrite previous registrations.
+	 *
+	 * @param array<int, array<string, mixed>> $icons Icon definitions.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */
-	private function normalize_icon_sets( array $icon_sets ): array {
-		$normalized = [];
-
-		foreach ( $icon_sets as $icon_set ) {
-			if ( ! is_array( $icon_set ) ) {
-				continue;
-			}
-
-			$name = $this->sanitize_slug( $icon_set['name'] ?? '' );
-
-			if ( empty( $name ) ) {
-				continue;
-			}
-
-			$icons = $icon_set['icons'] ?? [];
-
-			if ( ! is_array( $icons ) || empty( $icons ) ) {
-				continue;
-			}
-
-			$normalized_icons = $this->normalize_icons( $name, $icons );
-
-			if ( empty( $normalized_icons ) ) {
-				continue;
-			}
-
-			$normalized[] = [
-				'name'  => $name,
-				'label' => $this->get_label( $icon_set['label'] ?? '', $name ),
-				'icons' => $normalized_icons,
-			];
-		}
-
-		return $normalized;
-	}
-
-	/**
-	 * Normalise icons within a set.
-	 *
-	 * @param string $icon_set_name Icon set slug.
-	 * @param array  $icons Icon definitions.
-	 *
-	 * @return array<int, array<string, string>>
-	 */
-	private function normalize_icons( string $icon_set_name, array $icons ): array {
+	private function normalize_icons( array $icons ): array {
 		$normalized = [];
 
 		foreach ( $icons as $icon ) {
@@ -249,21 +275,56 @@ class IconRegistry implements StylesheetRegistryInterface {
 				continue;
 			}
 
-			$name   = $this->sanitize_slug( $icon['name'] ?? '' );
-			$source = $this->prepare_svg_source( $icon['source'] ?? '' );
+			$name = $icon['name'] ?? '';
 
-			if ( empty( $name ) || empty( $source ) ) {
+			// Ensure icon name is a string and contains namespace separator
+			if ( ! is_string( $name ) || empty( $name ) || ! str_contains( $name, '/' ) ) {
 				continue;
 			}
 
-			$normalized[] = [
-				'name'   => $name,
-				'label'  => $this->get_label( $icon['label'] ?? '', $name ),
-				'source' => $source,
+			// Support both 'content' and 'filePath' (like WordPress core)
+			$content   = $icon['content'] ?? '';
+			$file_path = $icon['filePath'] ?? '';
+
+			// Must have either content or filePath
+			if ( empty( $content ) && empty( $file_path ) ) {
+				continue;
+			}
+
+			// If both are provided, prefer content (like core does)
+			if ( ! empty( $content ) && ! empty( $file_path ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					esc_html__( 'Icons must provide either `content` or `filePath`, not both.', 'pulsar-extensions' ),
+					'1.0.0'
+				);
+				// Use content if both provided
+				$file_path = '';
+			}
+
+			// Prepare content - either use provided content or load from filePath
+			if ( ! empty( $content ) ) {
+				$prepared_content = $this->prepare_svg_content( $content );
+			} elseif ( ! empty( $file_path ) ) {
+				$prepared_content = $this->get_svg_source( $file_path );
+			} else {
+				continue;
+			}
+
+			if ( empty( $prepared_content ) ) {
+				continue;
+			}
+
+			// Use icon name as key to allow overwriting (themes can replace plugin icons)
+			$normalized[ $name ] = [
+				'name'    => $name,
+				'label'   => $this->get_label( $icon['label'] ?? '', $name ),
+				'content' => $prepared_content,
 			];
 		}
 
-		return $normalized;
+		// Return as indexed array (values only)
+		return array_values( $normalized );
 	}
 
 	/**
@@ -294,18 +355,18 @@ class IconRegistry implements StylesheetRegistryInterface {
 	/**
 	 * Prepare an SVG string for downstream usage.
 	 *
-	 * @param string $source Raw SVG markup.
+	 * @param string $content Raw SVG markup.
 	 *
 	 * @return string
 	 */
-	private function prepare_svg_source( string $source ): string {
-		$source = trim( $source );
+	private function prepare_svg_content( string $content ): string {
+		$content = trim( $content );
 
-		if ( empty( $source ) || ! str_contains( $source, '<svg' ) ) {
+		if ( empty( $content ) || ! str_contains( $content, '<svg' ) ) {
 			return '';
 		}
 
-		return $source;
+		return $content;
 	}
 
 	/**
@@ -315,39 +376,41 @@ class IconRegistry implements StylesheetRegistryInterface {
 	 * but adapted for icons that use a local CSS variable approach.
 	 *
 	 * WordPress generates: .has-{slug}-{property} { {property}: var(--wp--preset--{type}--{slug}) !important; }
-	 * This generates: .has-icon-{set}-{name} { --icon: url(...) !important; }
+	 * This generates: .has-icon-{namespace}-{name} { --icon: url(...) !important; }
 	 *
 	 * The --icon variable is then consumed by block styles (e.g., mask-image: var(--icon)).
 	 *
-	 * @param array<int, array<string, mixed>> $icon_sets Icon sets.
+	 * @param array<int, array<string, mixed>> $icons Icons array.
 	 *
 	 * @return string
 	 */
-	private function get_icon_variable_rules( array $icon_sets ): string {
+	private function get_icon_variable_rules( array $icons ): string {
 		$generator = new StylesheetGenerator();
 
-		foreach ( $icon_sets as $icon_set ) {
-			$set_name = $icon_set['name'];
+		foreach ( $icons as $icon ) {
+			$icon_name = $icon['name'] ?? '';
+			$content   = $icon['content'] ?? '';
 
-			foreach ( $icon_set['icons'] as $icon ) {
-				$icon_name = $icon['name'];
-				$mask_url  = $this->svg_to_data_uri( $icon['source'] );
-
-				if ( empty( $mask_url ) ) {
-					continue;
-				}
-
-				$selector = $this->get_icon_selector( $set_name, $icon_name );
-
-				// Generate utility class following WordPress pattern.
-				$rule = $generator->generate_utility_class(
-					$selector,
-					[ '--icon' => $mask_url ],
-					true
-				);
-
-				$generator->add_rule( $rule );
+			if ( empty( $icon_name ) || empty( $content ) ) {
+				continue;
 			}
+
+			$mask_url = $this->svg_to_data_uri( $content );
+
+			if ( empty( $mask_url ) ) {
+				continue;
+			}
+
+			$selector = $this->get_icon_selector( $icon_name );
+
+			// Generate utility class following WordPress pattern.
+			$rule = $generator->generate_utility_class(
+				$selector,
+				[ '--icon' => $mask_url ],
+				true
+			);
+
+			$generator->add_rule( $rule );
 		}
 
 		return $generator->get_stylesheet();
@@ -375,18 +438,21 @@ class IconRegistry implements StylesheetRegistryInterface {
 	 * Build the CSS selector for a specific icon.
 	 *
 	 * Follows WordPress pattern: .has-{slug}-{property}
-	 * Example: .has-icon-default-arrow-right
+	 * Example: .has-icon-pulsar-extensions-arrow-right
 	 *
-	 * @param string $icon_set Icon set slug.
-	 * @param string $icon     Icon slug.
+	 * Parses namespaced icon name (e.g., pulsar-extensions/arrow-right)
+	 * and converts to CSS class (e.g., .has-icon-pulsar-extensions-arrow-right).
+	 *
+	 * @param string $icon_name Namespaced icon name (e.g., pulsar-extensions/arrow-right).
 	 *
 	 * @return string
 	 */
-	private function get_icon_selector( string $icon_set, string $icon ): string {
-		$set_slug  = sanitize_html_class( $icon_set );
-		$icon_slug = sanitize_html_class( $icon );
+	private function get_icon_selector( string $icon_name ): string {
+		// Replace slashes with hyphens for CSS class names
+		$class_name = str_replace( '/', '-', $icon_name );
+		$class_name = sanitize_html_class( $class_name );
 
-		return '.has-icon-' . $set_slug . '-' . $icon_slug;
+		return '.has-icon-' . $class_name;
 	}
 
 	/**

@@ -68,12 +68,14 @@ class Icons {
 	}
 
 	/**
-	 * Get all icon sets and their icons.
+	 * Get all icons.
+	 *
+	 * Returns a flat array compatible with WordPress 7.0 icon registry API format.
 	 *
 	 * @return WP_REST_Response
 	 */
 	public function get_icons() {
-		$icon_sets = IconRegistry::instance()->get_icon_sets();
-		return rest_ensure_response( $icon_sets );
+		$icons = IconRegistry::instance()->get_icons();
+		return rest_ensure_response( $icons );
 	}
 }
