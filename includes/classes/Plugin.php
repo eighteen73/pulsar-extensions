@@ -9,6 +9,7 @@ namespace Eighteen73\PulsarExtensions;
 
 use Eighteen73\PulsarExtensions\Api;
 use Eighteen73\PulsarExtensions\Extensions\Group;
+use Eighteen73\PulsarExtensions\Extensions\PostTemplate;
 use Eighteen73\PulsarExtensions\Registries\IconRegistry;
 use Eighteen73\PulsarExtensions\Registries\StickyOffsetRegistry;
 
@@ -51,6 +52,7 @@ class Plugin {
 
 		Api\Icons::instance()->setup();
 		Group\Link::instance()->setup();
+		PostTemplate\Grid::instance()->setup();
 	}
 
 	/**
@@ -186,10 +188,11 @@ class Plugin {
 	 */
 	private function get_block_name_for_folder( string $folder ): string {
 		$default_map = [
-			'button'  => 'core/button',
-			'column'  => 'core/column',
-			'columns' => 'core/columns',
-			'group'   => 'core/group',
+			'button'        => 'core/button',
+			'column'        => 'core/column',
+			'columns'       => 'core/columns',
+			'group'         => 'core/group',
+			'post-template' => 'core/post-template',
 		];
 
 		/**
