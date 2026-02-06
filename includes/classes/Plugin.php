@@ -9,6 +9,7 @@ namespace Eighteen73\PulsarExtensions;
 
 use Eighteen73\PulsarExtensions\Api;
 use Eighteen73\PulsarExtensions\Extensions\Group;
+use Eighteen73\PulsarExtensions\Extensions\PostTemplate;
 use Eighteen73\PulsarExtensions\Registries\IconRegistry;
 use Eighteen73\PulsarExtensions\Registries\StickyOffsetRegistry;
 
@@ -44,6 +45,7 @@ class Plugin {
 		add_action( 'init', [ $this, 'load_textdomain' ] );
 		add_action( 'init', [ $this, 'register_block_styles' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_registry_stylesheets' ] );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_registry_stylesheets' ] );
 		add_action( 'enqueue_block_assets', [ $this, 'enqueue_view_scripts' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_global_editor_scripts' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_scripts' ] );
@@ -51,6 +53,7 @@ class Plugin {
 
 		Api\Icons::instance()->setup();
 		Group\Link::instance()->setup();
+		PostTemplate\Grid::instance()->setup();
 	}
 
 	/**
@@ -186,10 +189,11 @@ class Plugin {
 	 */
 	private function get_block_name_for_folder( string $folder ): string {
 		$default_map = [
-			'button'  => 'core/button',
-			'column'  => 'core/column',
-			'columns' => 'core/columns',
-			'group'   => 'core/group',
+			'button'        => 'core/button',
+			'column'        => 'core/column',
+			'columns'       => 'core/columns',
+			'group'         => 'core/group',
+			'post-template' => 'core/post-template',
 		];
 
 		/**
@@ -273,7 +277,7 @@ class Plugin {
 		foreach ( $this->get_stylesheet_registries() as $registry ) {
 			$handle = $registry->get_handle();
 
-			// Skip if already enqueued
+			// Skip if already enqueued in this request
 			if ( isset( $enqueued[ $handle ] ) ) {
 				continue;
 			}
@@ -285,12 +289,15 @@ class Plugin {
 				continue;
 			}
 
-			// Register the style if needed
+			// Register the style if needed (using false as source for inline-only styles)
 			if ( ! wp_style_is( $handle, 'registered' ) ) {
 				wp_register_style( $handle, false, [], PULSAR_EXTENSIONS_VERSION );
 			}
 
+			// Enqueue the style
 			wp_enqueue_style( $handle );
+
+			// Add inline styles - must be called after wp_enqueue_style()
 			wp_add_inline_style( $handle, $css );
 
 			$enqueued[ $handle ] = true;
