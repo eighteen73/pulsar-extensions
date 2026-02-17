@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import {
-	PanelBody,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	Dropdown,
+	DropdownMenu,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { siteLogo } from '@wordpress/icons';
 
 /**
  * External dependencies
@@ -24,6 +24,7 @@ import clsx from 'clsx';
 import ColorControl from '../../components/color-control';
 import './editor.scss';
 import './style.scss';
+import { IconLeft, IconRight, IconTrash } from '../../components/icons';
 
 /**
  * additional block attributes object
@@ -108,6 +109,13 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 		setAttributes({ icon: updatedIcon });
 	};
 
+	/**
+	 * Helper to remove icon
+	 */
+	const removeIcon = () => {
+		setAttributes({ icon: null });
+	};
+
 	// Parse namespaced icon name for IconPicker
 	const iconParts = parseIconName(name);
 	const iconPickerValue = iconParts
@@ -116,40 +124,81 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 
 	return (
 		<>
-			<InspectorControls group="settings">
-				<PanelBody title={__('Icon', 'pulsar-extensions')}>
-					<IconPicker
-						className="pulsar-extensions-icon-picker"
-						value={iconPickerValue}
-						onChange={(value) => {
-							const { iconSet, name: iconName } = value;
-							const namespacedName = buildIconName(
-								iconSet,
-								iconName
-							);
-							updateIcon({ name: namespacedName });
-						}}
+			<BlockControls>
+				<ToolbarGroup>
+					<Dropdown
+						popoverProps={{ placement: 'bottom-start' }}
+						renderToggle={({ isOpen, onToggle }) => (
+							<ToolbarButton
+								onClick={onToggle}
+								aria-expanded={isOpen}
+								icon={siteLogo}
+								label={
+									icon
+										? __('Change Icon', 'pulsar-extensions')
+										: __('Add Icon', 'pulsar-extensions')
+								}
+							/>
+						)}
+						renderContent={() => (
+							<IconPicker
+								value={iconPickerValue.name}
+								onChange={(value) => {
+									const { iconSet, name: iconName } = value;
+									const namespacedName = buildIconName(
+										iconSet,
+										iconName
+									);
+									updateIcon({ name: namespacedName });
+								}}
+							/>
+						)}
 					/>
 
-					<ToggleGroupControl
-						label={__('Icon position', 'pulsar-extensions')}
-						value={position}
-						onChange={(value) => updateIcon({ position: value })}
-						isBlock
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-					>
-						<ToggleGroupControlOption
-							value="before"
-							label={__('Before', 'pulsar-extensions')}
-						/>
-						<ToggleGroupControlOption
-							value="after"
-							label={__('After', 'pulsar-extensions')}
-						/>
-					</ToggleGroupControl>
-				</PanelBody>
-			</InspectorControls>
+					{icon && (
+						<>
+							<ToolbarButton
+								onClick={() => {
+									removeIcon();
+								}}
+								icon={IconTrash}
+								label={__('Remove Icon', 'pulsar-extensions')}
+							/>
+
+							<DropdownMenu
+								icon={
+									position === 'before' ? IconLeft : IconRight
+								}
+								label="Change icon position"
+								controls={[
+									{
+										name: 'before',
+										title: 'Icon left',
+										icon: IconLeft,
+										isActive: position === 'before',
+										onClick: () => {
+											updateIcon({
+												position: 'before',
+											});
+										},
+									},
+									{
+										name: 'after',
+										title: 'Icon right',
+										icon: IconRight,
+										isActive: position === 'after',
+										onClick: () => {
+											updateIcon({
+												position: 'after',
+											});
+										},
+									},
+								]}
+							/>
+						</>
+					)}
+				</ToolbarGroup>
+			</BlockControls>
 
 			<InspectorControls group="color">
 				<ColorControl
