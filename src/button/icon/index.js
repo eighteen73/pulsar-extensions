@@ -4,7 +4,7 @@
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { Dropdown, ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { pullLeft, pullRight, siteLogo, trash } from '@wordpress/icons';
+import { siteLogo } from '@wordpress/icons';
 
 /**
  * External dependencies
@@ -22,6 +22,7 @@ import clsx from 'clsx';
 import ColorControl from '../../components/color-control';
 import './editor.scss';
 import './style.scss';
+import { IconLeft, IconRight, IconTrash } from '../../components/icons';
 
 /**
  * additional block attributes object
@@ -166,7 +167,7 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 								onClick={() => {
 									removeIcon();
 								}}
-								icon={trash}
+								icon={IconTrash}
 								label={__('Remove Icon', 'pulsar-extensions')}
 							/>
 
@@ -174,7 +175,7 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 								onClick={() => {
 									updateIcon({ position: 'before' });
 								}}
-								icon={pullLeft}
+								icon={IconLeft}
 								label={__(
 									'Show Icon Before Text',
 									'pulsar-extensions'
@@ -186,7 +187,7 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 								onClick={() => {
 									updateIcon({ position: 'after' });
 								}}
-								icon={pullRight}
+								icon={IconRight}
 								label={__(
 									'Show Icon After Text',
 									'pulsar-extensions'
