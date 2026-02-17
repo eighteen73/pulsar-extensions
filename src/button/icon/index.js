@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import { Dropdown, ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	Dropdown,
+	DropdownMenu,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { siteLogo } from '@wordpress/icons';
 
@@ -10,10 +15,7 @@ import { siteLogo } from '@wordpress/icons';
  * External dependencies
  */
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
-import {
-	Icon,
-	IconPicker,
-} from '@10up/block-components/components/icon-picker';
+import { IconPicker } from '@10up/block-components/components/icon-picker';
 import clsx from 'clsx';
 
 /**
@@ -120,14 +122,6 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 		? { name: iconParts.iconName, iconSet: iconParts.namespace }
 		: { name: null, iconSet: null };
 
-	const buttonIcon =
-		iconPickerValue?.name && iconPickerValue?.iconSet ? (
-			<Icon
-				name={iconPickerValue?.name}
-				iconSet={iconPickerValue?.iconSet}
-			/>
-		) : null;
-
 	return (
 		<>
 			<BlockControls>
@@ -138,7 +132,7 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 							<ToolbarButton
 								onClick={onToggle}
 								aria-expanded={isOpen}
-								icon={icon ? buttonIcon : siteLogo}
+								icon={siteLogo}
 								label={
 									icon
 										? __('Change Icon', 'pulsar-extensions')
@@ -171,28 +165,35 @@ function BlockEdit({ clientId, attributes, setAttributes }) {
 								label={__('Remove Icon', 'pulsar-extensions')}
 							/>
 
-							<ToolbarButton
-								onClick={() => {
-									updateIcon({ position: 'before' });
-								}}
-								icon={IconLeft}
-								label={__(
-									'Show Icon Before Text',
-									'pulsar-extensions'
-								)}
-								isActive={position === 'before'}
-							/>
-
-							<ToolbarButton
-								onClick={() => {
-									updateIcon({ position: 'after' });
-								}}
-								icon={IconRight}
-								label={__(
-									'Show Icon After Text',
-									'pulsar-extensions'
-								)}
-								isActive={position === 'after'}
+							<DropdownMenu
+								icon={
+									position === 'before' ? IconLeft : IconRight
+								}
+								label="Change icon position"
+								controls={[
+									{
+										name: 'before',
+										title: 'Icon left',
+										icon: IconLeft,
+										isActive: position === 'before',
+										onClick: () => {
+											updateIcon({
+												position: 'before',
+											});
+										},
+									},
+									{
+										name: 'after',
+										title: 'Icon right',
+										icon: IconRight,
+										isActive: position === 'after',
+										onClick: () => {
+											updateIcon({
+												position: 'after',
+											});
+										},
+									},
+								]}
 							/>
 						</>
 					)}
