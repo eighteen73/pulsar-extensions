@@ -1,10 +1,19 @@
-// WordPress dependencies
+/**
+ * WordPress dependencies
+ */
 import { InspectorControls } from '@wordpress/block-editor';
 import { FocalPointPicker, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-// External dependencies
+/**
+ * External dependencies
+ */
 import { registerBlockExtension } from '@10up/block-components';
+
+/**
+ * Internal dependencies
+ */
+import './style.scss';
 
 /**
  * additional block attributes object
