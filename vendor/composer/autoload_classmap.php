@@ -10,6 +10,7 @@ return array(
     'Eighteen73\\PulsarExtensions\\Api\\Icons' => $baseDir . '/includes/classes/Api/Icons.php',
     'Eighteen73\\PulsarExtensions\\Extensions\\Button\\Icon' => $baseDir . '/includes/classes/Extensions/Button/Icon.php',
     'Eighteen73\\PulsarExtensions\\Extensions\\Group\\Link' => $baseDir . '/includes/classes/Extensions/Group/Link.php',
+    'Eighteen73\\PulsarExtensions\\Extensions\\PostFeaturedImage\\FocalPoint' => $baseDir . '/includes/classes/Extensions/PostFeaturedImage/FocalPoint.php',
     'Eighteen73\\PulsarExtensions\\Extensions\\PostTemplate\\Grid' => $baseDir . '/includes/classes/Extensions/PostTemplate/Grid.php',
     'Eighteen73\\PulsarExtensions\\Plugin' => $baseDir . '/includes/classes/Plugin.php',
     'Eighteen73\\PulsarExtensions\\Registries\\IconRegistry' => $baseDir . '/includes/classes/Registries/IconRegistry.php',
