@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * External dependencies
  */
-import { registerBlockExtension } from '@10up/block-components';
+import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 
 /**
  * Internal dependencies
