@@ -39,6 +39,10 @@ const PostFeaturedImageFocalPoint = () => {
 		[featuredImageId]
 	);
 
+	if (meta === undefined || meta === null) {
+		return null;
+	}
+
 	const { _thumbnail_focal_point: focalPoint } = meta;
 
 	const onChangeFocalPoint = (value) => {
