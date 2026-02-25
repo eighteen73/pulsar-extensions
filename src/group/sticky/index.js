@@ -195,6 +195,7 @@ function BlockEdit(props) {
 
 							{unstickOnMobile && (
 								<BreakpointSelectionControl
+									disabledBreakpoints={['xs']}
 									label={__(
 										'Unstick breakpoint',
 										'pulsar-extensions'

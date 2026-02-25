@@ -81,6 +81,7 @@ function BlockEdit(props) {
 
 						{isStackedOnMobile && !isFlexWrapEnabled && (
 							<BreakpointSelectionControl
+								disabledBreakpoints={['xs']}
 								label={__(
 									'Stacked breakpoint',
 									'pulsar-extensions'

@@ -46,6 +46,7 @@ function BlockEdit({ attributes, setAttributes }) {
 			{isStackedOnMobile && (
 				<div style={{ padding: '0 16px 16px' }}>
 					<BreakpointSelectionControl
+						disabledBreakpoints={['xs']}
 						label={__('Stacked breakpoint', 'pulsar-extensions')}
 						value={stackedBreakpoint || 'md'}
 						onChange={(value) =>

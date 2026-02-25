@@ -1,6 +1,10 @@
 import { __ } from '@wordpress/i18n';
 
 const breakpoints = {
+	xs: {
+		label: 'XS',
+		help: __('Small mobile screens.', 'pulsar-extensions'),
+	},
 	sm: {
 		label: 'SM',
 		help: __('Mobile screens.', 'pulsar-extensions'),
