@@ -14,6 +14,14 @@ const PostFeaturedImageFocalPoint = () => {
 		[]
 	);
 
+	const supportsThumbnail = useSelect(
+		(select) => {
+			const type = select('core').getPostType(postType);
+			return type?.supports?.thumbnail === true;
+		},
+		[postType]
+	);
+
 	const [meta, setMeta] = useEntityProp('postType', postType, 'meta');
 
 	// get the posts featured image id
@@ -39,7 +47,7 @@ const PostFeaturedImageFocalPoint = () => {
 		[featuredImageId]
 	);
 
-	if (meta === undefined || meta === null) {
+	if (!supportsThumbnail || meta === undefined || meta === null) {
 		return null;
 	}
 
