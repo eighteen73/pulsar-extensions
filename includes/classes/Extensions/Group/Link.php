@@ -45,7 +45,7 @@ class Link {
 		$classes    = 'wp-block-group__link';
 
 		if ( ! empty( $attributes['linkClass'] ) ) {
-			$classes .= ' ' . $attributes['linkClass'];
+			$classes .= ' ' . $this->sanitize_link_classes( (string) $attributes['linkClass'] );
 		}
 
 		if ( empty( $url ) ) {
@@ -121,6 +121,7 @@ class Link {
 	 * @return string
 	 */
 	private function build_link_markup( string $url, string $link_class, string $link_target, string $link_rel, string $heading_content ): string {
+		$link_rel    = $this->normalize_link_rel( $link_target, $link_rel );
 		$class_attr  = $link_class ? sprintf( ' class="%s"', esc_attr( $link_class ) ) : '';
 		$target_attr = $link_target ? sprintf( ' target="%s"', esc_attr( $link_target ) ) : '';
 		$rel_attr    = $link_rel ? sprintf( ' rel="%s"', esc_attr( $link_rel ) ) : '';
@@ -131,8 +132,49 @@ class Link {
 			$class_attr,
 			$target_attr,
 			$rel_attr,
-			$heading_content
+			esc_attr( $heading_content )
 		);
+	}
+
+	/**
+	 * Sanitize a user-provided list of CSS classes.
+	 *
+	 * @param string $classes Space-separated class names.
+	 *
+	 * @return string
+	 */
+	private function sanitize_link_classes( string $classes ): string {
+		$class_list = preg_split( '/\s+/', trim( $classes ) );
+		if ( ! is_array( $class_list ) ) {
+			return '';
+		}
+
+		$sanitized = array_map( 'sanitize_html_class', $class_list );
+		$sanitized = array_filter( $sanitized );
+
+		return implode( ' ', $sanitized );
+	}
+
+	/**
+	 * Ensure external target links include required rel values.
+	 *
+	 * @param string $target Link target value.
+	 * @param string $rel    Existing rel value.
+	 *
+	 * @return string
+	 */
+	private function normalize_link_rel( string $target, string $rel ): string {
+		$rel_values = preg_split( '/\s+/', trim( $rel ) );
+		$rel_values = is_array( $rel_values ) ? array_filter( $rel_values ) : [];
+
+		if ( '_blank' === $target ) {
+			$rel_values[] = 'noopener';
+			$rel_values[] = 'noreferrer';
+		}
+
+		$rel_values = array_unique( $rel_values );
+
+		return implode( ' ', $rel_values );
 	}
 
 	/**
