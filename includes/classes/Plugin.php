@@ -453,9 +453,10 @@ class Plugin {
 
 				// Get asset version.
 				$asset_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.asset.php";
+				$version    = (string) filemtime( $style_path );
 				if ( file_exists( $asset_path ) ) {
 					$asset   = require $asset_path;
-					$version = $asset['version'];
+					$version = $asset['version'] ?? $version;
 				}
 
 				$style_handle = "pulsar-extensions-{$block}-{$extension}-style";
