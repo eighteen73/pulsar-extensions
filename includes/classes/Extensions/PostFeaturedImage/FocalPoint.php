@@ -75,16 +75,16 @@ class FocalPoint {
 					'single'            => true,
 					'type'              => 'object',
 					'default'           => self::DEFAULT_FOCAL_POINT,
-					'auth_callback'     => function () {
-						return current_user_can( 'edit_posts' );
+					'auth_callback'     => function ( $allowed, $meta_key, $post_id ) {
+						return current_user_can( 'edit_post', $post_id );
 					},
 					'sanitize_callback' => function ( $value ) {
 						if ( $value === null || ! is_array( $value ) ) {
 							return self::DEFAULT_FOCAL_POINT;
 						}
 						return [
-							'x' => isset( $value['x'] ) ? (float) $value['x'] : 0.5,
-							'y' => isset( $value['y'] ) ? (float) $value['y'] : 0.5,
+							'x' => isset( $value['x'] ) ? $this->clamp_focal_point( (float) $value['x'] ) : 0.5,
+							'y' => isset( $value['y'] ) ? $this->clamp_focal_point( (float) $value['y'] ) : 0.5,
 						];
 					},
 				]
@@ -103,23 +103,45 @@ class FocalPoint {
 	 */
 	public function render_focal_point( string $block_content, array $block, WP_Block $instance ): string {
 
-		// get the post id from context
-		$post_id = $instance->context['postId'];
+		$post_id = 0;
+		if ( isset( $instance->context['postId'] ) ) {
+			$post_id = (int) $instance->context['postId'];
+		}
+		if ( $post_id <= 0 ) {
+			return $block_content;
+		}
 
 		// get the post featured image focal point
 		$focal_point_object = get_post_meta( $post_id, '_thumbnail_focal_point', true );
 
 		// if the focal point is set, add the style attribute to the image
-		if ( $focal_point_object ) {
-			$focal_point = round( $focal_point_object['x'] * 100 ) . '% ' . round( $focal_point_object['y'] * 100 ) . '%';
+		if ( is_array( $focal_point_object ) && isset( $focal_point_object['x'], $focal_point_object['y'] ) ) {
+			$focal_point = round( $this->clamp_focal_point( (float) $focal_point_object['x'] ) * 100 ) . '% ' . round( $this->clamp_focal_point( (float) $focal_point_object['y'] ) * 100 ) . '%';
 			$tags        = new WP_HTML_Tag_Processor( $block_content );
 
-			$tags->next_tag( [ 'tag_name' => 'img' ] );
+			if ( ! $tags->next_tag( [ 'tag_name' => 'img' ] ) ) {
+				return $block_content;
+			}
+
 			$current_style = $tags->get_attribute( 'style' );
+			if ( ! is_string( $current_style ) ) {
+				$current_style = '';
+			}
 			$tags->set_attribute( 'style', $current_style . ' object-position: ' . $focal_point . ';' );
 			$block_content = $tags->get_updated_html();
 		}
 
 		return $block_content;
+	}
+
+	/**
+	 * Clamp focal-point values to the valid 0..1 range.
+	 *
+	 * @param float $value Raw value.
+	 *
+	 * @return float
+	 */
+	private function clamp_focal_point( float $value ): float {
+		return max( 0, min( 1, $value ) );
 	}
 }
