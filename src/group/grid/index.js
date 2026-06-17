@@ -43,7 +43,9 @@ function BlockEdit(props) {
 	const { layout, responsiveColumns = [] } = attributes;
 
 	const isGridLayout = layout?.type === 'grid';
-	const isManualMode = layout?.minimumColumnWidth === null;
+	const isManualMode =
+		layout?.minimumColumnWidth === null ||
+		layout?.minimumColumnWidth === undefined;
 	const allBreakpoints = Object.keys(breakpoints);
 	const defaultColumnCount = 3;
 
