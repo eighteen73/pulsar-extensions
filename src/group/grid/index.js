@@ -31,6 +31,29 @@ const additionalAttributes = {
 };
 
 /**
+ * isManualMode
+ *
+ * @param {Object} layout Layout object.
+ * @return {boolean} True if manual mode, false otherwise.
+ */
+function isManualMode(layout) {
+	return (
+		layout?.minimumColumnWidth === null ||
+		layout?.minimumColumnWidth === undefined
+	);
+}
+
+/**
+ * isGridLayout
+ *
+ * @param {Object} layout Layout object.
+ * @return {boolean} True if grid layout, false otherwise.
+ */
+function isGridLayout(layout) {
+	return layout?.type === 'grid';
+}
+
+/**
  * BlockEdit
  *
  * @param {Object}   props               Component props.
@@ -42,10 +65,6 @@ function BlockEdit(props) {
 	const { attributes, setAttributes } = props;
 	const { layout, responsiveColumns = [] } = attributes;
 
-	const isGridLayout = layout?.type === 'grid';
-	const isManualMode =
-		layout?.minimumColumnWidth === null ||
-		layout?.minimumColumnWidth === undefined;
 	const allBreakpoints = Object.keys(breakpoints);
 	const defaultColumnCount = 3;
 
@@ -63,7 +82,7 @@ function BlockEdit(props) {
 
 	return (
 		<>
-			{isGridLayout && isManualMode && (
+			{isGridLayout(layout) && isManualMode(layout) && (
 				<InspectorControls group="settings">
 					<PanelBody
 						title={__('Mobile layout', 'pulsar-extensions')}
@@ -181,10 +200,7 @@ function BlockEdit(props) {
 function generateClassNames(attributes) {
 	const { layout, responsiveColumns = [] } = attributes;
 
-	const isGridLayout = layout?.type === 'grid';
-	const isManualMode = layout?.minimumColumnWidth === null;
-
-	if (!(isGridLayout && isManualMode)) {
+	if (!(isGridLayout(layout) && isManualMode(layout))) {
 		return '';
 	}
 
