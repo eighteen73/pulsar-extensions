@@ -20,6 +20,19 @@ import BreakpointSelectionControl from './breakpoint-selection-control';
 
 const defaultColumnCount = 3;
 
+/**
+ * isManualMode
+ *
+ * @param {Object} layout Layout object.
+ * @return {boolean} True if manual mode, false otherwise.
+ */
+function isManualMode(layout) {
+	return (
+		layout?.minimumColumnWidth === null ||
+		layout?.minimumColumnWidth === undefined
+	);
+}
+
 export const responsiveColumnsAttributes = {
 	responsiveColumns: {
 		type: 'array',
@@ -32,7 +45,7 @@ export function ResponsiveGridEdit(props) {
 	const { layout, responsiveColumns = [] } = attributes;
 
 	const isGridLayout = layout?.type === 'grid';
-	const isManualMode = layout?.minimumColumnWidth === null;
+	const manualMode = isManualMode(layout);
 	const allBreakpoints = Object.keys(breakpoints);
 
 	const AddBreakpointButton = (addItem) => {
@@ -47,7 +60,7 @@ export function ResponsiveGridEdit(props) {
 		);
 	};
 
-	if (!(isGridLayout && isManualMode)) {
+	if (!(isGridLayout && manualMode)) {
 		return null;
 	}
 
@@ -146,9 +159,9 @@ export function generateResponsiveGridClasses(attributes) {
 	const { layout, responsiveColumns = [] } = attributes;
 
 	const isGridLayout = layout?.type === 'grid';
-	const isManualMode = layout?.minimumColumnWidth === null;
+	const manualMode = isManualMode(layout);
 
-	if (!(isGridLayout && isManualMode)) {
+	if (!(isGridLayout && manualMode)) {
 		return '';
 	}
 
