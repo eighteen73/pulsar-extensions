@@ -11,6 +11,7 @@ use Eighteen73\PulsarExtensions\Api;
 use Eighteen73\PulsarExtensions\Extensions\Group;
 use Eighteen73\PulsarExtensions\Extensions\PostFeaturedImage;
 use Eighteen73\PulsarExtensions\Extensions\PostTemplate;
+use Eighteen73\PulsarExtensions\Extensions\TermTemplate;
 use Eighteen73\PulsarExtensions\Registries\IconRegistry;
 use Eighteen73\PulsarExtensions\Registries\StickyOffsetRegistry;
 
@@ -56,6 +57,7 @@ class Plugin {
 		Group\Link::instance()->setup();
 		PostFeaturedImage\FocalPoint::instance()->setup();
 		PostTemplate\Grid::instance()->setup();
+		TermTemplate\Grid::instance()->setup();
 	}
 
 	/**
