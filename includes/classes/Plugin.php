@@ -11,6 +11,7 @@ use Eighteen73\PulsarExtensions\Api;
 use Eighteen73\PulsarExtensions\Extensions\Group;
 use Eighteen73\PulsarExtensions\Extensions\PostFeaturedImage;
 use Eighteen73\PulsarExtensions\Extensions\PostTemplate;
+use Eighteen73\PulsarExtensions\Extensions\TermTemplate;
 use Eighteen73\PulsarExtensions\Registries\IconRegistry;
 use Eighteen73\PulsarExtensions\Registries\StickyOffsetRegistry;
 
@@ -56,6 +57,7 @@ class Plugin {
 		Group\Link::instance()->setup();
 		PostFeaturedImage\FocalPoint::instance()->setup();
 		PostTemplate\Grid::instance()->setup();
+		TermTemplate\Grid::instance()->setup();
 	}
 
 	/**
@@ -453,9 +455,10 @@ class Plugin {
 
 				// Get asset version.
 				$asset_path = PULSAR_EXTENSIONS_PATH . "build/{$block}/{$extension}.asset.php";
+				$version    = (string) filemtime( $style_path );
 				if ( file_exists( $asset_path ) ) {
 					$asset   = require $asset_path;
-					$version = $asset['version'];
+					$version = $asset['version'] ?? $version;
 				}
 
 				$style_handle = "pulsar-extensions-{$block}-{$extension}-style";

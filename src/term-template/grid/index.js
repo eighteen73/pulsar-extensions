@@ -14,8 +14,8 @@ import {
 } from '../../components/responsive-grid-extension';
 import './style.scss';
 
-registerBlockExtension('core/post-template', {
-	extensionName: 'pulsar-extensions/post-template/grid',
+registerBlockExtension('core/term-template', {
+	extensionName: 'pulsar-extensions/term-template/grid',
 	attributes: responsiveColumnsAttributes,
 	classNameGenerator: generateResponsiveGridClasses,
 	inlineStyleGenerator: generateResponsiveGridInlineStyles,
