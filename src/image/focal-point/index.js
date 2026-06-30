@@ -46,7 +46,7 @@ const ImageFocalPointEdit = (props) => {
 				<InspectorControls>
 					<PanelBody>
 						<FocalPointPicker
-							label={__('Focal Point', 'pulsar')}
+							label={__('Focal Point', 'pulsar-extensions')}
 							url={url}
 							value={focalPoint}
 							onChange={onChangeFocalPoint}

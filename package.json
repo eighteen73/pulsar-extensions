@@ -1,7 +1,7 @@
 {
 	"name": "pulsar-extensions",
-	"version": "0.1.0",
-	"description": "Example Block",
+	"version": "0.4.1",
+	"description": "Extensions for the Pulsar theme.",
 	"author": "eighteen73",
 	"license": "GPL-2.0-or-later",
 	"homepage": "https://eighteen73.co.uk",
@@ -11,7 +11,7 @@
 		"build": "wp-scripts build  --webpack-copy-php --blocks-manifest",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
-		"format": "npm run format:css && npm run format:js && format:php",
+		"format": "npm run format:css && npm run format:js && npm run format:php",
 		"format:css": "stylelint --fix \"./src/**/*.scss\"",
 		"format:js": "eslint --fix \"./src/**/*.js\"",
 		"format:php": "composer run format",
