@@ -3,7 +3,7 @@
         'name' => 'eighteen73/pulsar-extensions',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '973f5bdb39f0af4a8a0b6636b5e853205b2301c6',
+        'reference' => '226c145413bd55fd855e966f11f6770e3d8cb7dd',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'eighteen73/pulsar-extensions' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '973f5bdb39f0af4a8a0b6636b5e853205b2301c6',
+            'reference' => '226c145413bd55fd855e966f11f6770e3d8cb7dd',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -27,6 +27,7 @@ class ComposerStaticInit5cae7fb94c12a33f6492cd8268e6b938
         'Eighteen73\\PulsarExtensions\\Extensions\\Group\\Link' => __DIR__ . '/../..' . '/includes/classes/Extensions/Group/Link.php',
         'Eighteen73\\PulsarExtensions\\Extensions\\PostFeaturedImage\\FocalPoint' => __DIR__ . '/../..' . '/includes/classes/Extensions/PostFeaturedImage/FocalPoint.php',
         'Eighteen73\\PulsarExtensions\\Extensions\\PostTemplate\\Grid' => __DIR__ . '/../..' . '/includes/classes/Extensions/PostTemplate/Grid.php',
+        'Eighteen73\\PulsarExtensions\\Extensions\\TermTemplate\\Grid' => __DIR__ . '/../..' . '/includes/classes/Extensions/TermTemplate/Grid.php',
         'Eighteen73\\PulsarExtensions\\Plugin' => __DIR__ . '/../..' . '/includes/classes/Plugin.php',
         'Eighteen73\\PulsarExtensions\\Registries\\IconRegistry' => __DIR__ . '/../..' . '/includes/classes/Registries/IconRegistry.php',
         'Eighteen73\\PulsarExtensions\\Registries\\StickyOffsetRegistry' => __DIR__ . '/../..' . '/includes/classes/Registries/StickyOffsetRegistry.php',

@@ -12,6 +12,7 @@ return array(
     'Eighteen73\\PulsarExtensions\\Extensions\\Group\\Link' => $baseDir . '/includes/classes/Extensions/Group/Link.php',
     'Eighteen73\\PulsarExtensions\\Extensions\\PostFeaturedImage\\FocalPoint' => $baseDir . '/includes/classes/Extensions/PostFeaturedImage/FocalPoint.php',
     'Eighteen73\\PulsarExtensions\\Extensions\\PostTemplate\\Grid' => $baseDir . '/includes/classes/Extensions/PostTemplate/Grid.php',
+    'Eighteen73\\PulsarExtensions\\Extensions\\TermTemplate\\Grid' => $baseDir . '/includes/classes/Extensions/TermTemplate/Grid.php',
     'Eighteen73\\PulsarExtensions\\Plugin' => $baseDir . '/includes/classes/Plugin.php',
     'Eighteen73\\PulsarExtensions\\Registries\\IconRegistry' => $baseDir . '/includes/classes/Registries/IconRegistry.php',
     'Eighteen73\\PulsarExtensions\\Registries\\StickyOffsetRegistry' => $baseDir . '/includes/classes/Registries/StickyOffsetRegistry.php',
