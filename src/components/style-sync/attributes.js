@@ -9,6 +9,7 @@ import { getBlockType } from '@wordpress/blocks';
  */
 import {
 	hasAlignSupport,
+	hasAspectRatioSupport,
 	hasBorderSupport,
 	hasBackgroundColorSupport,
 	hasTextAlignSupport,
@@ -18,11 +19,13 @@ import {
 	hasFontFamilySupport,
 	hasFontSizeSupport,
 	hasLayoutSupport,
+	hasScaleSupport,
 	hasStyleSupport,
 } from './supports';
 
 /**
- * Default style attributes allowlist, matching Gutenberg Copy/Paste Styles.
+ * Default style attributes allowlist, matching Gutenberg Copy/Paste Styles
+ * plus aspect ratio / scale for blocks like Image.
  *
  * Each value is a support checker `( blockName ) => boolean`.
  *
@@ -34,6 +37,7 @@ import {
  */
 export const DEFAULT_STYLE_ATTRIBUTES = {
 	align: hasAlignSupport,
+	aspectRatio: hasAspectRatioSupport,
 	borderColor: (nameOrType) => hasBorderSupport(nameOrType, 'color'),
 	backgroundColor: hasBackgroundColorSupport,
 	textAlign: hasTextAlignSupport,
@@ -43,7 +47,8 @@ export const DEFAULT_STYLE_ATTRIBUTES = {
 	fontFamily: hasFontFamilySupport,
 	fontSize: hasFontSizeSupport,
 	layout: hasLayoutSupport,
-	// Includes style.spacing (margin, padding, blockGap), typography, color, border, etc.
+	scale: hasScaleSupport,
+	// Includes style.spacing, style.dimensions.aspectRatio, typography, color, border, etc.
 	style: hasStyleSupport,
 };
 

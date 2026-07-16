@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	getBlockType,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 
 /**
  * Support helpers mirrored from Gutenberg block-editor hooks/supports
@@ -24,6 +28,8 @@ const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
 const LAYOUT_SUPPORT_KEY = 'layout';
 const SPACING_SUPPORT_KEY = 'spacing';
+const DIMENSIONS_SUPPORT_KEY = 'dimensions';
+const ASPECT_RATIO_SUPPORT_KEY = 'dimensions.aspectRatio';
 
 const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -45,6 +51,7 @@ const STYLE_SUPPORT_KEYS = [
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
+	DIMENSIONS_SUPPORT_KEY,
 ];
 
 /**
@@ -143,6 +150,36 @@ export const hasFontSizeSupport = (nameOrType) =>
  */
 export const hasLayoutSupport = (nameOrType) =>
 	hasBlockSupport(nameOrType, LAYOUT_SUPPORT_KEY);
+
+/**
+ * Whether the block supports aspect ratio via attribute or dimensions support.
+ *
+ * @param {string|Object} nameOrType Block name or type.
+ * @return {boolean} Whether aspect ratio can be synced.
+ */
+export const hasAspectRatioSupport = (nameOrType) => {
+	if (hasBlockSupport(nameOrType, ASPECT_RATIO_SUPPORT_KEY)) {
+		return true;
+	}
+
+	const blockType =
+		typeof nameOrType === 'string' ? getBlockType(nameOrType) : nameOrType;
+
+	return !!blockType?.attributes?.aspectRatio;
+};
+
+/**
+ * Whether the block supports object-fit scale (paired with aspect ratio on Image).
+ *
+ * @param {string|Object} nameOrType Block name or type.
+ * @return {boolean} Whether scale can be synced.
+ */
+export const hasScaleSupport = (nameOrType) => {
+	const blockType =
+		typeof nameOrType === 'string' ? getBlockType(nameOrType) : nameOrType;
+
+	return !!blockType?.attributes?.scale;
+};
 
 /**
  * @param {string|Object} nameOrType Block name or type.
