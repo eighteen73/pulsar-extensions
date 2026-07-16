@@ -197,6 +197,7 @@ class Plugin {
 			'column'              => 'core/column',
 			'columns'             => 'core/columns',
 			'group'               => 'core/group',
+			'paragraph'           => 'core/paragraph',
 			'post-featured-image' => 'core/post-featured-image',
 			'post-template'       => 'core/post-template',
 		];
