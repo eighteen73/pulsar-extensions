@@ -225,6 +225,7 @@ class Plugin {
 	public function enqueue_global_editor_scripts(): void {
 		$global_scripts = [
 			'editor/register-icons',
+			'editor/style-sync',
 		];
 
 		foreach ( $global_scripts as $script_name ) {
