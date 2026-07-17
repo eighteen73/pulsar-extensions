@@ -14,18 +14,20 @@ import { Strings } from '../constants/strings';
 /**
  * Toolbar control for inserting placeholder text.
  *
- * @param {Object}   props                 Component props.
- * @param {string}   props.placeholderType Key in Strings.placeholders.
- * @param {string}   props.attribute       Block attribute to populate.
- * @param {Function} props.setAttributes   Attribute setter provided by Gutenberg.
+ * @param {Object}   props                   Component props.
+ * @param {string}   props.placeholderType   Key in Strings.placeholders.
+ * @param {string}   props.customPlaceholder Custom placeholder text.
+ * @param {string}   props.attribute         Block attribute to populate.
+ * @param {Function} props.setAttributes     Attribute setter provided by Gutenberg.
  * @return {JSX.Element|null} Toolbar control or null when unavailable.
  */
 export default function PlaceholderControl({
 	placeholderType,
+	customPlaceholder,
 	attribute,
 	setAttributes,
 }) {
-	const content = Strings.placeholders[placeholderType];
+	const content = customPlaceholder || Strings.placeholders[placeholderType];
 
 	if (!content) {
 		return null;
