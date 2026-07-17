@@ -18,15 +18,15 @@ import PlaceholderControl from '../../components/placeholder-control';
 function PlaceholderEdit({ setAttributes }) {
 	return (
 		<PlaceholderControl
-			placeholderType="paragraph"
+			placeholderType="heading"
 			attribute="content"
 			setAttributes={setAttributes}
 		/>
 	);
 }
 
-registerBlockExtension('core/paragraph', {
-	extensionName: 'pulsar-extensions/paragraph/placeholder',
+registerBlockExtension('core/heading', {
+	extensionName: 'pulsar-extensions/heading/placeholder',
 	classNameGenerator: () => null,
 	Edit: PlaceholderEdit,
 	order: 'after',
