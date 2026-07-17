@@ -164,6 +164,7 @@ class Plugin {
 	private function get_enabled_extensions(): array {
 		$available_extensions = $this->get_available_extensions();
 		$enabled_extensions   = [];
+		$load_placeholders    = $this->should_load_placeholder_extensions();
 
 		foreach ( $available_extensions as $block => $extensions ) {
 			/**
@@ -175,6 +176,16 @@ class Plugin {
 			 */
 			$filtered_extensions = apply_filters( "pulsar_extensions_{$block}", $extensions );
 
+			// Placeholder tooling is development-only.
+			if ( ! $load_placeholders && is_array( $filtered_extensions ) ) {
+				$filtered_extensions = array_values(
+					array_filter(
+						$filtered_extensions,
+						static fn( $extension ) => 'placeholder' !== $extension
+					)
+				);
+			}
+
 			// Ensure the filter returns an array.
 			if ( is_array( $filtered_extensions ) && ! empty( $filtered_extensions ) ) {
 				$enabled_extensions[ $block ] = $filtered_extensions;
@@ -182,6 +193,17 @@ class Plugin {
 		}
 
 		return $enabled_extensions;
+	}
+
+	/**
+	 * Whether placeholder extensions should load.
+	 *
+	 * Limited to local and development environments.
+	 *
+	 * @return bool
+	 */
+	private function should_load_placeholder_extensions(): bool {
+		return in_array( wp_get_environment_type(), [ 'development', 'staging' ], true );
 	}
 
 	/**
@@ -197,6 +219,7 @@ class Plugin {
 			'column'              => 'core/column',
 			'columns'             => 'core/columns',
 			'group'               => 'core/group',
+			'heading'             => 'core/heading',
 			'paragraph'           => 'core/paragraph',
 			'post-featured-image' => 'core/post-featured-image',
 			'post-template'       => 'core/post-template',
