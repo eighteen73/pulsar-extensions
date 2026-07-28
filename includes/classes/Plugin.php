@@ -198,12 +198,12 @@ class Plugin {
 	/**
 	 * Whether placeholder extensions should load.
 	 *
-	 * Limited to local and development environments.
+	 * Limited to local and development environments for administrators.
 	 *
 	 * @return bool
 	 */
 	private function should_load_placeholder_extensions(): bool {
-		return in_array( wp_get_environment_type(), [ 'development', 'staging' ], true );
+		return in_array( wp_get_environment_type(), [ 'development', 'staging' ], true ) && current_user_can( 'manage_options' );
 	}
 
 	/**
