@@ -231,7 +231,7 @@ const AddMediaEdit = (props) => {
 								onSelect={onSelectMedia}
 								onReset={onRemoveMedia}
 								name={__(
-									'Edit Uploaded Icon',
+									'Edit custom icon',
 									'pulsar-extensions'
 								)}
 							/>
@@ -244,7 +244,7 @@ const AddMediaEdit = (props) => {
 								render={({ open }) => (
 									<ToolbarButton
 										text={__(
-											'Upload Icon',
+											'Custom icon',
 											'pulsar-extensions'
 										)}
 										onClick={open}
