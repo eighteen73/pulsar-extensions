@@ -9,6 +9,7 @@ namespace Eighteen73\PulsarExtensions;
 
 use Eighteen73\PulsarExtensions\Api;
 use Eighteen73\PulsarExtensions\Extensions\Group;
+use Eighteen73\PulsarExtensions\Extensions\Icon;
 use Eighteen73\PulsarExtensions\Extensions\PostFeaturedImage;
 use Eighteen73\PulsarExtensions\Extensions\PostTemplate;
 use Eighteen73\PulsarExtensions\Extensions\TermTemplate;
@@ -55,6 +56,7 @@ class Plugin {
 
 		Api\Icons::instance()->setup();
 		Group\Link::instance()->setup();
+		Icon\AddMedia::instance()->setup();
 		PostFeaturedImage\FocalPoint::instance()->setup();
 		PostTemplate\Grid::instance()->setup();
 		TermTemplate\Grid::instance()->setup();
@@ -223,6 +225,7 @@ class Plugin {
 			'paragraph'           => 'core/paragraph',
 			'post-featured-image' => 'core/post-featured-image',
 			'post-template'       => 'core/post-template',
+			'icon'                => 'core/icon',
 		];
 
 		/**
