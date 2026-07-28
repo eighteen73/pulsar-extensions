@@ -4,7 +4,7 @@
 import { BlockControls } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { paragraph } from '@wordpress/icons';
+import { language } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +37,7 @@ export default function PlaceholderControl({
 		<BlockControls group="other">
 			<ToolbarGroup>
 				<ToolbarButton
-					icon={paragraph}
+					icon={language}
 					label={__('Insert placeholder text', 'pulsar-extensions')}
 					onClick={() => setAttributes({ [attribute]: content })}
 				/>
