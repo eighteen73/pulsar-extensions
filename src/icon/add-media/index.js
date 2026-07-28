@@ -3,11 +3,20 @@
  */
 import {
 	BlockControls,
+	InspectorControls,
 	MediaReplaceFlow,
 	MediaUpload,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanel as ToolsPanel,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -21,6 +30,11 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { registerBlockExtension } from '@10up/block-components/api/register-block-extension';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 const ALLOWED_MEDIA_TYPES = ['image/svg+xml'];
 const SVG_MIME = 'image/svg+xml';
 const MEDIA_ICON_PREFIX = 'pulsar-media/';
@@ -31,6 +45,10 @@ const MEDIA_ICON_PREFIX = 'pulsar-media/';
 const additionalAttributes = {
 	iconId: {
 		type: 'number',
+	},
+	overrideColor: {
+		type: 'boolean',
+		default: false,
 	},
 };
 
@@ -163,7 +181,7 @@ const CustomIconSync = ({ attributes, setAttributes }) => {
  */
 const AddMediaEdit = (props) => {
 	const { attributes, setAttributes } = props;
-	const { iconId } = attributes;
+	const { iconId, overrideColor } = attributes;
 
 	const { receiveEntityRecords } = useDispatch(coreStore);
 
@@ -214,6 +232,7 @@ const AddMediaEdit = (props) => {
 		setAttributes({
 			iconId: undefined,
 			icon: undefined,
+			overrideColor: false,
 		});
 	};
 
@@ -255,6 +274,32 @@ const AddMediaEdit = (props) => {
 					</MediaUploadCheck>
 				</ToolbarGroup>
 			</BlockControls>
+
+			{iconId && (
+				<InspectorControls group="styles">
+					<ToolsPanel label={__('Custom icon', 'pulsar-extensions')}>
+						<ToolsPanelItem
+							label={__('Override color', 'pulsar-extensions')}
+							hasValue={() => overrideColor}
+							onDeselect={() =>
+								setAttributes({ overrideColor: false })
+							}
+							isShownByDefault
+						>
+							<ToggleControl
+								label={__(
+									'Override color',
+									'pulsar-extensions'
+								)}
+								checked={overrideColor}
+								onChange={(value) =>
+									setAttributes({ overrideColor: value })
+								}
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
+			)}
 		</>
 	);
 };
@@ -283,9 +328,31 @@ addFilter(
 	withCustomIconSync
 );
 
+/**
+ * generateClassNames
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} Generated class list representing responsive column states.
+ */
+function generateClassNames(attributes) {
+	const { overrideColor, iconId } = attributes;
+
+	if (!iconId) {
+		return null;
+	}
+
+	let className = 'has-custom-icon';
+
+	if (overrideColor) {
+		className += ' is-override-color';
+	}
+
+	return className;
+}
+
 registerBlockExtension('core/icon', {
 	extensionName: 'pulsar-extensions/add-media',
 	attributes: additionalAttributes,
-	classNameGenerator: () => null,
+	classNameGenerator: generateClassNames,
 	Edit: AddMediaEdit,
 });

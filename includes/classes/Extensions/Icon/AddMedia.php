@@ -115,7 +115,8 @@ class AddMedia {
 			$attributes = $block['attrs'];
 		}
 
-		$icon_id = isset( $attributes['iconId'] ) ? (int) $attributes['iconId'] : 0;
+		$icon_id        = isset( $attributes['iconId'] ) ? (int) $attributes['iconId'] : 0;
+		$override_color = isset( $attributes['overrideColor'] ) && true === $attributes['overrideColor'];
 
 		if ( ! $icon_id ) {
 			return $block_content;
@@ -152,7 +153,7 @@ class AddMedia {
 
 		$wrapper_attributes = get_block_wrapper_attributes(
 			[
-				'class' => 'has-custom-icon',
+				'class' => 'has-custom-icon' . ( $override_color ? ' is-override-color' : '' ),
 			]
 		);
 
