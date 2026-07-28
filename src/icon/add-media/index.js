@@ -3,20 +3,11 @@
  */
 import {
 	BlockControls,
-	InspectorControls,
 	MediaReplaceFlow,
 	MediaUpload,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import {
-	ToggleControl,
-	ToolbarButton,
-	ToolbarGroup,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalToolsPanel as ToolsPanel,
-	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -45,10 +36,6 @@ const MEDIA_ICON_PREFIX = 'pulsar-media/';
 const additionalAttributes = {
 	iconId: {
 		type: 'number',
-	},
-	overrideColor: {
-		type: 'boolean',
-		default: false,
 	},
 };
 
@@ -181,7 +168,7 @@ const CustomIconSync = ({ attributes, setAttributes }) => {
  */
 const AddMediaEdit = (props) => {
 	const { attributes, setAttributes } = props;
-	const { iconId, overrideColor } = attributes;
+	const { iconId } = attributes;
 
 	const { receiveEntityRecords } = useDispatch(coreStore);
 
@@ -232,7 +219,6 @@ const AddMediaEdit = (props) => {
 		setAttributes({
 			iconId: undefined,
 			icon: undefined,
-			overrideColor: false,
 		});
 	};
 
@@ -274,32 +260,6 @@ const AddMediaEdit = (props) => {
 					</MediaUploadCheck>
 				</ToolbarGroup>
 			</BlockControls>
-
-			{iconId && (
-				<InspectorControls group="styles">
-					<ToolsPanel label={__('Custom icon', 'pulsar-extensions')}>
-						<ToolsPanelItem
-							label={__('Override color', 'pulsar-extensions')}
-							hasValue={() => overrideColor}
-							onDeselect={() =>
-								setAttributes({ overrideColor: false })
-							}
-							isShownByDefault
-						>
-							<ToggleControl
-								label={__(
-									'Override color',
-									'pulsar-extensions'
-								)}
-								checked={overrideColor}
-								onChange={(value) =>
-									setAttributes({ overrideColor: value })
-								}
-							/>
-						</ToolsPanelItem>
-					</ToolsPanel>
-				</InspectorControls>
-			)}
 		</>
 	);
 };
@@ -335,17 +295,13 @@ addFilter(
  * @return {string} Generated class list representing responsive column states.
  */
 function generateClassNames(attributes) {
-	const { overrideColor, iconId } = attributes;
+	const { iconId } = attributes;
 
 	if (!iconId) {
 		return null;
 	}
 
-	let className = 'has-custom-icon';
-
-	if (overrideColor) {
-		className += ' is-override-color';
-	}
+	const className = 'has-custom-icon';
 
 	return className;
 }

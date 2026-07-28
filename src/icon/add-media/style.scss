@@ -1,7 +1,5 @@
 .wp-block-icon {
-	&.has-custom-icon.is-override-color {
-		svg path {
-			fill: currentcolor !important; // stylelint-disable-line declaration-no-important
-		}
+	&.has-custom-icon svg.has-text-color path {
+		fill: currentcolor !important; // stylelint-disable-line declaration-no-important
 	}
 }
