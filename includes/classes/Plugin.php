@@ -9,6 +9,7 @@ namespace Eighteen73\PulsarExtensions;
 
 use Eighteen73\PulsarExtensions\Api;
 use Eighteen73\PulsarExtensions\Extensions\Group;
+use Eighteen73\PulsarExtensions\Extensions\Icon;
 use Eighteen73\PulsarExtensions\Extensions\PostFeaturedImage;
 use Eighteen73\PulsarExtensions\Extensions\PostTemplate;
 use Eighteen73\PulsarExtensions\Extensions\TermTemplate;
@@ -55,6 +56,7 @@ class Plugin {
 
 		Api\Icons::instance()->setup();
 		Group\Link::instance()->setup();
+		Icon\AddMedia::instance()->setup();
 		PostFeaturedImage\FocalPoint::instance()->setup();
 		PostTemplate\Grid::instance()->setup();
 		TermTemplate\Grid::instance()->setup();
@@ -164,6 +166,7 @@ class Plugin {
 	private function get_enabled_extensions(): array {
 		$available_extensions = $this->get_available_extensions();
 		$enabled_extensions   = [];
+		$load_placeholders    = $this->should_load_placeholder_extensions();
 
 		foreach ( $available_extensions as $block => $extensions ) {
 			/**
@@ -175,6 +178,16 @@ class Plugin {
 			 */
 			$filtered_extensions = apply_filters( "pulsar_extensions_{$block}", $extensions );
 
+			// Placeholder tooling is development-only.
+			if ( ! $load_placeholders && is_array( $filtered_extensions ) ) {
+				$filtered_extensions = array_values(
+					array_filter(
+						$filtered_extensions,
+						static fn( $extension ) => 'placeholder' !== $extension
+					)
+				);
+			}
+
 			// Ensure the filter returns an array.
 			if ( is_array( $filtered_extensions ) && ! empty( $filtered_extensions ) ) {
 				$enabled_extensions[ $block ] = $filtered_extensions;
@@ -182,6 +195,17 @@ class Plugin {
 		}
 
 		return $enabled_extensions;
+	}
+
+	/**
+	 * Whether placeholder extensions should load.
+	 *
+	 * Limited to local and development environments for administrators.
+	 *
+	 * @return bool
+	 */
+	private function should_load_placeholder_extensions(): bool {
+		return in_array( wp_get_environment_type(), [ 'development', 'staging' ], true ) && current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -197,8 +221,11 @@ class Plugin {
 			'column'              => 'core/column',
 			'columns'             => 'core/columns',
 			'group'               => 'core/group',
+			'heading'             => 'core/heading',
+			'paragraph'           => 'core/paragraph',
 			'post-featured-image' => 'core/post-featured-image',
 			'post-template'       => 'core/post-template',
+			'icon'                => 'core/icon',
 		];
 
 		/**
@@ -225,6 +252,7 @@ class Plugin {
 	public function enqueue_global_editor_scripts(): void {
 		$global_scripts = [
 			'editor/register-icons',
+			'editor/style-sync',
 		];
 
 		foreach ( $global_scripts as $script_name ) {

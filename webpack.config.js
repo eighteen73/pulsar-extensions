@@ -15,6 +15,7 @@ const getEntryName = (file) => {
 const buildEntries = () => {
 	const files = fg.sync(['src/**/index.js', 'src/**/view.js'], {
 		onlyFiles: true,
+		ignore: ['src/components/**'],
 	});
 
 	return files.reduce(
@@ -30,6 +31,7 @@ module.exports = {
 	...defaultConfig,
 	entry: {
 		'editor/register-icons': './src/editor/register-icons.js',
+		'editor/style-sync': './src/editor/style-sync.js',
 		...buildEntries(),
 	},
 };
